@@ -5,6 +5,14 @@
 *0.9.0*
 First public release
 
+#### Dependencies
+The library is dependent on the following:
+
+* Google gson >= 2.3
+* Apache Commons Codec >= 1.6
+* Jetty Websocket Client >= 9.2.11
+* Google Guava >= 15.0
+
 #### Instructions
 More information on the flowthings.io platform is available at:
 
