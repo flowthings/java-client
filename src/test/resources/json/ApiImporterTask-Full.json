@@ -1,0 +1,19 @@
+{
+    "id" : "q5575ec612b738dfc9af73118",
+    "creationDate" : 1433791585846,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "description" : "This is a description",
+    "destination" : "/alice/pears",
+    "disabled" : true,
+    "displayName" : "Display",
+    "js" : "function(abc) {return abc}",
+    "lastRun" : 0,
+    "lastEditDate" : 1433792025397,
+    "nextRun" : 0,
+    "periodicity" : 500000,
+    "reportFlowId" : "f5575ec612b738dfc9af7311a",
+    "reportPath" : "/alice/:reports/q5575ec612b738dfc9af73118-report",
+    "runCt" : 0,
+    "status" : "OK"
+  
+}

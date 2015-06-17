@@ -1,0 +1,15 @@
+{
+    "id" : "t557601702b738dfc9af7319c",
+    "creationDate" : 1433796976988,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "description" : "This is a description",
+    "duration" : 360000000,
+    "issuedBy" : "i551ac39ad4c6c02e55b74632",
+    "paths" : {
+      "/alice/pears" : {
+        "dropRead" : true,
+        "dropWrite" : false
+      }
+    },
+    "expiresInMs" : 359999991
+}

@@ -1,0 +1,17 @@
+{
+    "id" : "m5575fdcc2b738dfc9af73180",
+    "clientId" : "10",
+    "creationDate" : 1433796044303,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "destination" : "/alice/pears",
+    "password" : "onetwothree",
+    "qos" : 0,
+    "reportFlowId" : "f5575fdcc2b738dfc9af73182",
+    "reportFrequency" : 300000,
+    "reportPath" : "/alice/:reports/m5575fdcc2b738dfc9af73180-report",
+    "status" : "OK",
+    "topic" : "aliens",
+    "uri" : "tcp://abc",
+    "username" : "abc",
+    "version" : "3.1.1"
+}

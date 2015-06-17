@@ -1,0 +1,9 @@
+{
+   "status": 404,
+   "ok": false,
+   "messages": [],
+   "errors": [
+     "The requested resource could not be located at this address."
+   ],
+   "references": {}
+}

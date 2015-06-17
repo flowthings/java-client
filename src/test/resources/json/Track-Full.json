@@ -1,0 +1,11 @@
+{
+    "id" : "t5576059b2b738dfc9af731a5",
+    "creationDate" : 1433798043721,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "destination" : "/alice/pears/test1",
+    "disabled" : false,
+    "filter" : "a==2",
+    "js" : "function(a) {a.elems.b = 2; return a;}",
+    "lastEditDate" : 1433798043721,
+    "source" : "/alice/apples"
+}

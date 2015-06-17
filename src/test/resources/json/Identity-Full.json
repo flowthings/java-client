@@ -1,0 +1,27 @@
+{
+    "id" : "i5575fa2c2b738dfc9af7315b",
+    "creationDate" : 1433795116056,
+    "creatorId" : "i000000000000000000000001",
+    "email" : "test@example.com",
+    "firstName" : "Joe",
+    "groupIds" : [ "g5575fa442b738dfc9af73165" ],
+    "icon" : "wooo",
+    "lastName" : "Bloggs",
+    "lastEditDate" : 1433795116056,
+    "masterToken" : "Vxw6fikd3squUTbtKlaGyw3sHFVgxGZj",
+    "middleName" : "Harvey",
+    "name" : "joeb",
+    "salutation" : "Mr",
+    "shares" : {
+      "s5575faf52b738dfc9af7316d" : {
+        "paths" : {
+          "/alice/pears" : {
+            "read" : true,
+            "write" : false,
+            "dropRead" : false,
+            "dropWrite" : false
+          }
+        }
+      }
+    }
+}

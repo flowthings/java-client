@@ -1,0 +1,14 @@
+{
+    "id" : "q5575ece82b738dfc9af73121",
+    "creationDate" : 1433791720785,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "destination" : "/alice/pears",
+    "js" : "function(abc) {return abc}",
+    "lastRun" : 0,
+    "nextRun" : 0,
+    "periodicity" : 500000,
+    "reportFlowId" : "f5575ece82b738dfc9af73123",
+    "reportPath" : "/alice/:reports/q5575ece82b738dfc9af73121-report",
+    "runCt" : 0,
+    "status" : "OK"
+}

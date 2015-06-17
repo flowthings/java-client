@@ -1,0 +1,12 @@
+{
+    "id" : "r5576002c2b738dfc9af73193",
+    "creationDate" : 1433796652783,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "lastRun" : 0,
+    "nextRun" : 0,
+    "periodicity" : 3600000,
+    "reportFlowId" : "f5576002c2b738dfc9af73195",
+    "reportPath" : "/alice/:reports/r5576002c2b738dfc9af73193-report",
+    "runCt" : 0,
+    "status" : "OK"
+}

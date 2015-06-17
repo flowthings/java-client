@@ -1,0 +1,148 @@
+{
+    "id" : "d0000000000018cc6666f6f00",
+    "flowId" : "f55523257adc66a5ff36e731c",
+    "creationDate" : 1433800947425,
+    "path" : "/alice/apples",
+    "parentDropId" : {
+    	"flowId" : "f55523257adc66a5ff36e731c",
+    	"dropId" : "d55523257adc66a5ff36e731c"
+    },
+    "lastEditDate" : 1433800947425,
+    "location" : {
+      "lat" : 0.06031791922725516,
+      "lon" : 0.6709274265862697,
+      "specifiers" : { }
+    },
+    "fhash" : "foo",
+    "elems" : {
+      "date" : {
+        "type" : "date",
+        "value" : -5182434507407376000
+      },
+      "string" : {
+        "type" : "string",
+        "value" : "a string"
+      },
+      "treemap" : {
+        "type" : "sortedMap",
+        "value" : {
+          "A" : {
+            "type" : "integer",
+            "value" : 1
+          },
+          "B" : {
+            "type" : "integer",
+            "value" : 2
+          }
+        }
+      },
+      "double" : {
+        "type" : "float",
+        "value" : 0.27918789880679074
+      },
+      "hashset" : {
+        "type" : "set",
+        "value" : [ {
+          "type" : "string",
+          "value" : "A"
+        }, {
+          "type" : "string",
+          "value" : "B"
+        }, {
+          "type" : "string",
+          "value" : "C"
+        } ]
+      },
+      "length" : {
+        "type" : "length",
+        "value" : {
+          "magnitude" : 0.304681212195798,
+          "unit" : "meters"
+        }
+      },
+      "integer" : {
+        "type" : "integer",
+        "value" : -1683365352
+      },
+      "media" : {
+        "type" : "media",
+        "value" : {
+          "THIS WILL GET IGNORED" : "ANY",
+          "text" : "some text",
+          "title" : "some title",
+          "type" : "HTML",
+          "version" : "1.0"
+        }
+      },
+      "arraylist" : {
+        "type" : "list",
+        "value" : [ {
+          "type" : "string",
+          "value" : "A"
+        }, {
+          "type" : "string",
+          "value" : "B"
+        }, {
+          "type" : "string",
+          "value" : "C"
+        } ]
+      },
+      "duration" : {
+        "type" : "duration",
+        "value" : {
+          "magnitude" : 908.3536188862238,
+          "unit" : "milliseconds"
+        }
+      },
+      "boolean" : {
+        "type" : "boolean",
+        "value" : true
+      },
+      "location" : {
+        "type" : "location",
+        "value" : {
+          "lat" : 0.06031791922725516,
+          "lon" : 0.6709274265862697,
+          "specifiers" : {
+            "ZIP" : "11355",
+            "STATE" : "NY",
+            "STREET" : "42-40 Bowne St."
+          }
+        }
+      },
+      "text" : {
+        "type" : "text",
+        "value" : {
+          "content" : "some text",
+          "format" : "html",
+          "safe" : true
+        }
+      },
+      "hashmap" : {
+        "type" : "map",
+        "value" : {
+          "A" : {
+            "type" : "integer",
+            "value" : 1
+          },
+          "B" : {
+            "type" : "integer",
+            "value" : 2
+          }
+        }
+      },
+      "treeset" : {
+        "type" : "sortedSet",
+        "value" : [ {
+          "type" : "string",
+          "value" : "A"
+        }, {
+          "type" : "string",
+          "value" : "B"
+        }, {
+          "type" : "string",
+          "value" : "C"
+        } ]
+      }
+    }
+}

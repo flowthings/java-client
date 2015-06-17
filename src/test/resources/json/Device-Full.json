@@ -1,0 +1,16 @@
+{
+    "id" : "v5575ee192b738dfc9af7312a",
+    "creationDate" : 1433792025397,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "deviceSummary" : {
+      "foo" : "bar",
+      "baz" : 3
+    },
+    "displayName" : "Display",
+    "lastEditDate" : 1433792025397,
+    "path" : "/alice/pears",
+    "reportPeriodicity" : 60000,
+    "status" : "UNSEEN",
+    "tokenId" : "k5575ee192b738dfc9af7312b",
+    "timeSinceLastSeen" : -1
+}

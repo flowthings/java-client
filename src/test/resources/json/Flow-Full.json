@@ -1,0 +1,11 @@
+{
+    "id" : "f5575f4e02b738dfc9af7314c",
+    "capacity" : 500,
+    "creationDate" : 1433793760545,
+    "creatorId" : "i551ac39ad4c6c02e55b74632",
+    "description" : "This is a description",
+    "filter" : "a==2",
+    "lastEditDate" : 1433792025397,
+    "path" : "/alice/pears/test1",
+    "public" : true
+}
