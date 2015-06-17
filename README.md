@@ -23,6 +23,9 @@ Create a free flowthings.io account and note down your `Master Token`.
 Here is an example of how to use the client:
 
 ```java
+
+import static com.flowthings.client.api.Flowthings.*
+
 // Credentials
 Credentials credentials = new Credentials("<account>", "<token>");
 RestApi api = new RestApi(credentials);
@@ -34,8 +37,8 @@ Flow inputFlow = new Flow.Builder().setPath(inputPath).get();
 Flow outputFlow = new Flow.Builder().setPath(outputPath).get();
 
 // Send command to the platform
-inputFlow = api.send(Flowthings.flow().create(inputFlow));
-outputFlow = api.send(Flowthings.flow().create(outputFlow));
+inputFlow = api.send(flow().create(inputFlow));
+outputFlow = api.send(flow().create(outputFlow));
 
 // Create a Track
 String js = 
@@ -51,14 +54,18 @@ String js =
         + "return null;"
         + "}";
  
-Track track = new Track.Builder().setSource(inputPath).setDestination(outputPath).setJs(js).get();
+Track track = new Track.Builder()
+	.setSource(inputPath)
+	.setDestination(outputPath)
+	.setJs(js)
+	.get();
 
 // Track create
-api.send(Flowthings.track().create(track));
+api.send(track().create(track));
 
 // Subscribe to Websockets to get instant pushes of alerts
 WebsocketApi wsApi = new WebsocketApi(credentials);
-wsApi.send(Flowthings.drop(outputFlow.getId()).subscribe(
+wsApi.send(drop(outputFlow.getId()).subscribe(
     new SubscriptionCallback<Drop>() {
       public void onMessage(Drop t) {
         System.out.println("I got the alert: " + t);
@@ -69,8 +76,9 @@ wsApi.send(Flowthings.drop(outputFlow.getId()).subscribe(
 Drop d1 = new Drop.Builder().addElem("temperature", 60).get();
 Drop d2 = new Drop.Builder().addElem("temperature", 85).get();
 
-api.send(Flowthings.drop(inputFlow.getId()).create(d1)).get();
-api.send(Flowthings.drop(inputFlow.getId()).create(d2)).get();
+// The response will arrive at some time in the future
+Future<Drop> f1 = api.send(drop(inputFlow.getId()).create(d1));
+Future<Drop> f2 = api.send(drop(inputFlow.getId()).create(d2));
 
 Thread.sleep(500);
 ```
