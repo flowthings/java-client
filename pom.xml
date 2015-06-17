@@ -7,7 +7,16 @@
 	<packaging>jar</packaging>
 
 	<name>Flowthings.io Java Client Core Library</name>
+	<description>A client library for flowthings.io realtime event processing</description>
 	<url>http://flowthings.io</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<dependency>
@@ -19,17 +28,17 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3</version>
+			<version>[2.3,)</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.6</version>
+			<version>[1.6,)</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>websocket-client</artifactId>
-			<version>9.2.11.v20150529</version>
+			<version>[9.2.11.v20150529,)</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
