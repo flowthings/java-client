@@ -54,14 +54,14 @@ String js =
         + "return null;"
         + "}";
  
-Track track = new Track.Builder()
+Track alertTrack = new Track.Builder()
 	.setSource(inputPath)
 	.setDestination(outputPath)
 	.setJs(js)
 	.get();
 
 // Track create
-api.send(track().create(track));
+api.send(track().create(alertTrack));
 
 // Subscribe to Websockets to get instant pushes of alerts
 WebsocketApi wsApi = new WebsocketApi(credentials);
