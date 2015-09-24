@@ -11,6 +11,11 @@ import com.flowthings.client.domain.Share;
 import com.flowthings.client.domain.Token;
 import com.flowthings.client.domain.Track;
 
+/**
+ * Entry point for creating requests to flowthings.io
+ *
+ * @author matt
+ */
 public class Flowthings {
 
   private static MutableDomainObjectApi<ApiImporterTask> apiImporter = new MutableDomainObjectApi<>(

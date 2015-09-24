@@ -1,6 +1,5 @@
 package com.flowthings.client;
 
-import java.awt.Color;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -346,24 +345,6 @@ public abstract class DropElementSerializer<T> {
     @Override
     public JsonElement toPrimitive(byte[] b) {
       return new JsonPrimitive(base64.encodeAsString(b));
-    }
-  };
-  protected static DropElementSerializer<Color> COLOR = new DropElementSerializer<Color>("color") {
-    @Override
-    public Color from(String type, JsonElement e) {
-      JsonObject c = e.getAsJsonObject();
-      return new Color(extractIntMember(c, "red"), extractIntMember(c, "green"), extractIntMember(c, "blue"),
-          extractIntMember(c, "alpha"));
-    }
-
-    @Override
-    public JsonObject toPrimitive(Color t) {
-      JsonObject color = new JsonObject();
-      color.add("red", INTEGER.to(t.getRed()));
-      color.add("green", INTEGER.to(t.getGreen()));
-      color.add("blue", INTEGER.to(t.getBlue()));
-      color.add("alpha", INTEGER.to(t.getAlpha()));
-      return color;
     }
   };
   protected static DropElementSerializer<Location> LOCATION = new DropElementSerializer<Location>("location") {

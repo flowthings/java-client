@@ -1,3 +1,10 @@
+v0.9.1 - 09/25/2015
+==============
+- Remove unneccessary info logging
+- Update dependency versions
+- Additional tests
+- Configurable server destination
+
 v0.9 - 06/17/2015
 ==============
 - First public release!

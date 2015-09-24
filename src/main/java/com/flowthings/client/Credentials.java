@@ -4,6 +4,40 @@ import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Holds credentials necessary to authenticate with flowthings.io any of our
+ * APIs.
+ * 
+ * <p>
+ * Credentials consist of an "account" and "token". The account is your
+ * flowthings.io username. The token is either:
+ * </p>
+ * <ul>
+ * <li>Your <a href="https://flowthings.io/docs/master-token">Master Token</a></li>
+ * <li>A generated <a
+ * href="https://flowthings.io/docs/token-object-overview">Token Object</a></li>
+ * </ul>
+ * 
+ * <p>
+ * This class also gives a convenience method for retrieving credentials from <a
+ * href="https://console.ng.bluemix.net">IBM Bluemix</a>
+ * </p>
+ *
+ * <pre>
+ * {@code
+ *  
+ *  // Using vanilla credentials
+ *  Credentials creds = new Credentials("matt", "SSOjDZ4VMHS2JcwT1sIpE8x91QfG");
+ *  
+ *  // Or get from Bluemix, or revert to provided if not available
+ *  Credentials bluemixCreds = Credentials.fromBluemixOrDefault(creds);
+ *  
+ *  RestApi api = new RestApi(bluemixCreds);
+ * }}
+ * </pre>
+ *
+ * @author matt
+ */
 public class Credentials {
   public String account;
   public String token;
@@ -25,8 +59,9 @@ public class Credentials {
    * Will attempt to get credentials from the IBM Bluemix environment. If this
    * fails, the supplied credentials will be used
    * 
-   * @param credentials
-   * @return
+   * @param defaultCredentials
+   *          - to be used if Bluemix credentials cannot be sourced
+   * @return a credentials object
    */
   public static Credentials fromBluemixOrDefault(Credentials defaultCredentials) {
     String VCAP_SERVICES = System.getenv("VCAP_SERVICES");

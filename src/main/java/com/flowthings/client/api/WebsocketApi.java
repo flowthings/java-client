@@ -1,5 +1,10 @@
 package com.flowthings.client.api;
 
+/**
+ * Send requests over HTTP. Responses are synchronous.
+ *
+ * @author matt
+ */
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLConnection;

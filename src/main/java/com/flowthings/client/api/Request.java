@@ -13,7 +13,31 @@ import com.flowthings.client.domain.Types;
 import com.flowthings.client.response.Response;
 import com.google.gson.reflect.TypeToken;
 
-// reponse<flow>>, flow ...
+/**
+ * A Request object represents a command that can be sent to flowthings.io, e.g
+ * to Create, Get, Find, Update or Delete and object. These apply to the common
+ * flowthings.io objects, such as Flows, Tracks, and Drops.
+ * 
+ * <p>
+ * In most cases, requests can be sent over any of the APIs (REST, WebSockets).
+ * If the request is naturally idempotent, such as Find or Get, they can be
+ * reused multiple times.
+ * </p>
+ *
+ * <pre>
+ * {@code
+ *  
+ *  Credentials credentials = new Credentials(accountName, tokenString);
+ *  RestApi api = new RestApi(credentials);
+ *  
+ *  List<Flow> results = api.send(Flowthings.flow().find(new QueryOptions().limit(5)));
+ * }
+ * </pre>
+ *
+ * @author matt
+ * @param <S>
+ *          the object type
+ */
 public class Request<S> {
 
   private static final Pattern ID_PATTERN = Pattern.compile("[a-z][0-9a-f]{24}");

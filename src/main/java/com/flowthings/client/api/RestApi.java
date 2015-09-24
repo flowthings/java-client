@@ -9,7 +9,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.flowthings.client.Credentials;
@@ -23,6 +22,11 @@ import com.flowthings.client.response.ListResponse;
 import com.flowthings.client.response.ObjectResponse;
 import com.flowthings.client.response.Response;
 
+/**
+ * Send requests over HTTP. Responses are synchronous.
+ *
+ * @author matt
+ */
 public class RestApi extends Api {
 
   protected static Logger logger = Logger.getLogger("com.flow.client.api.RestApi");
@@ -68,7 +72,7 @@ public class RestApi extends Api {
       if (request.body != null) {
         connection.setDoOutput(true);
         try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-          logger.log(Level.INFO, request.body);
+          // logger.log(Level.INFO, request.body);
 
           out.writeBytes(request.body);
           out.flush();

@@ -4,66 +4,71 @@ import java.util.List;
 
 import com.flowthings.client.QueryOptions;
 
+/**
+ * Methods to create {@link Request} objects, based on actions which the user
+ * might want to perform
+ *
+ * @author matt
+ */
 public class DomainObjectApi<T> {
 
   protected Class<T> clazz;
-
-  // protected String url = "https://api.flowthings.io/v0.1/";
 
   public DomainObjectApi(Class<T> clazz) {
     this.clazz = clazz;
   }
 
+  /**
+   * Retrieve a single object by ID
+   * 
+   * @param id
+   *          - the object's ID
+   * @return - A request object, to pass to an API
+   */
   public Request<T> get(String id) {
-    return Request.createObjectRequest(clazz, Request.Action.GET)//
-        .id(id);
+    return Request.createObjectRequest(clazz, Request.Action.GET).id(id);
   }
 
+  /**
+   * Find multiple objects using search parameters
+   * 
+   * @param queryOptions
+   *          - search parameters
+   * @return - A request object, to pass to an API
+   */
   public Request<List<T>> find(QueryOptions queryOptions) {
-    return Request.createListRequest(clazz, Request.Action.FIND)//
-        .params(queryOptions);
+    return Request.createListRequest(clazz, Request.Action.FIND).params(queryOptions);
   }
 
+  /**
+   * Create a new object
+   * 
+   * @param t
+   *          - the object to create
+   * @return - A request object, to pass to an API
+   */
   public Request<T> create(T t) {
-    return Request.createObjectRequest(clazz, Request.Action.CREATE)//
-        .body(t);
+    return Request.createObjectRequest(clazz, Request.Action.CREATE).body(t);
   }
 
+  /**
+   * Delete an object by ID
+   * 
+   * @param id
+   *          - the object's ID
+   * @return - A request object, to pass to an API
+   */
   public Request<T> delete(String id) {
-    return Request.createObjectRequest(clazz, Request.Action.DELETE)//
-        .id(id);
+    return Request.createObjectRequest(clazz, Request.Action.DELETE).id(id);
   }
 
-  //
-  // public Request<DomainObjectResponse<T>, T> deleteMember(String id, String
-  // memberName) {
-  // return Request.createObjectRequest(clazz, Request.Action.DELETE,
-  // credentials)//
-  // .method(RequestType.DELETE)//
-  // .path(buildPath(id, memberName));
-  // }
-  //
-  // public Request<DomainObjectResponse<T>, T> setMember(String id, String
-  // memberName, String memberValue) {
-  // return Request.createObjectRequest(clazz, credentials)//
-  // .method(RequestType.PUT)//
-  // .path(buildPath(id, memberName));
-  // }
-  //
-  // public Request<DomainObjectResponse<T>, T> getMember(String id, String
-  // memberName) {
-  // return Request.createObjectRequest(clazz, credentials)//
-  // .method(RequestType.GET)//
-  // .path(buildPath(id, memberName));
-  // }
-
+  /**
+   * Find multiple objects using search parameters
+   * 
+   * @return - A request object, to pass to an API
+   */
   public Request<List<T>> find() {
     return find(new QueryOptions());
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> Class<T> castClass(Class<?> aClass) {
-    return (Class<T>) aClass;
   }
 
 }

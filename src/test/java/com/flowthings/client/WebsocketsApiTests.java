@@ -131,4 +131,24 @@ public class WebsocketsApiTests {
     }
   }
 
+  // @Test
+  public void testLoad() throws FlowthingsException, InterruptedException, ExecutionException {
+
+    Drop r2 = null;
+    try {
+      // This flow doesn't exist
+      api = new WebsocketApi(new Credentials("alice", "N6KwpHHJHbURic5PcmIGrKAO2Nr73erH"), "localhost:17890", false);
+      int i = 0;
+      while (true) {
+        r2 = api.send(
+            Flowthings.drop("f55de25e0f23d91563c4e31fb").create(new Drop.Builder().addElem("foo", "bar").get())).get();
+        System.out.print(".");
+        if (i % 30 == 0) System.out.println("");
+        // Thread.sleep(10);
+        i++;
+      }
+    } catch (ExecutionException e) {
+    }
+  }
+
 }

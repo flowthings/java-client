@@ -117,22 +117,6 @@ public class MqttConnection extends Task {
     this.inputFormat = inputFormat;
   }
 
-  /**
-   * This connection has a destination . It will read drops from the broker and
-   * write to the destination flow.
-   */
-  public boolean isBrokerToFlowConnection() {
-    return destination != null;
-  }
-
-  /**
-   * This connection has a source flow. It will read drops from the source flow
-   * and write to the broker;
-   */
-  public boolean isFlowToBrokerConnection() {
-    return source != null;
-  }
-
   @Override
   public String toString() {
     return "MqttConnection [uri=" + uri + ", source=" + source + ", toString()=" + super.toString() + "]";

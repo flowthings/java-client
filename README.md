@@ -1,10 +1,5 @@
 ## flowthings.io Java Client
 
-#### Version History
-
-*0.9.0*
-First public release
-
 #### Dependencies
 The library is dependent on the following:
 

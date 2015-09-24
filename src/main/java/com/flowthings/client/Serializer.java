@@ -50,13 +50,13 @@ public class Serializer {
   }
 
   public static <T extends FlowDomainObject> ObjectResponse<T> fromJsonResponse(String s, Class<T> klazz) {
-    logger.log(Level.INFO, "Parsing type: " + klazz);
-    logger.log(Level.INFO, s);
+    // logger.log(Level.INFO, "Parsing type: " + klazz);
+    // logger.log(Level.INFO, s);
     return gson.fromJson(s, Types.get(klazz).tokenType);
   }
 
   public static MapResponse fromJsonMapResponse(String json, String key, Type t) {
-    logger.log(Level.INFO, json);
+    // logger.log(Level.INFO, json);
     ParseToken p = gson.fromJson(json, innerParseToken.getType());
     Object inner = gson.fromJson(p.value, t);
     return new MapResponse(p.head, key, inner);

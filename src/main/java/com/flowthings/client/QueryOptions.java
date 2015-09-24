@@ -3,6 +3,30 @@ package com.flowthings.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.flowthings.client.api.DomainObjectApi;
+
+/**
+ * <p>
+ * When making a {@link DomainObjectApi#find(QueryOptions)} request, use
+ * QueryOptions to specify:
+ * </p>
+ * 
+ * <ul>
+ * <li>The <a
+ * href="https://flowthings.io/docs/flowthings-filter-language">Filter
+ * String</a>, for restricting the result set returned</li>
+ * <li>The number of records to skip</li>
+ * <li>A limit to the number of records returned</li>
+ * <li>The order in which to sort the results</li>
+ * </ul>
+ * 
+ * <p>
+ * For examples, see <a href="https://flowthings.io/docs/http-flow-find">HTTP
+ * Flow Find</a>
+ * </p>
+ * 
+ * @author matt
+ */
 public class QueryOptions {
   public static final int DEFAULT_BATCH_SIZE = 20;
   public static final int DEFAULT_LIMIT_SIZE = 20;
@@ -12,24 +36,54 @@ public class QueryOptions {
   protected Integer limit;
   protected String filter;
 
+  /**
+   * The order in which to sort the results
+   * 
+   * @param sort
+   *          - a field to sort by
+   * @param sortType
+   *          - order of the sort
+   * @return - this
+   */
   public QueryOptions sort(String sort, SortType sortType) {
     sorts.clear();
     sorts.put(sort, sortType);
     return this;
   }
 
+  /**
+   * The number of records from the beginning which we shall skip
+   * 
+   * @param ct
+   *          - number of records to skip
+   * @return - this
+   */
   public QueryOptions skip(int ct) {
     this.skip = ct;
     return this;
   }
 
+  /**
+   * To limit the number of results returned
+   * 
+   * @param ct
+   *          - the number of results returned (default 20)
+   * @return - this
+   */
   public QueryOptions limit(int ct) {
     this.limit = ct;
     return this;
   }
 
-  public QueryOptions filter(String filter) {
-    this.filter = filter;
+  /**
+   * For defining the parameters of the search
+   * 
+   * @param filterStr
+   *          - flowthings filter language
+   * @return - this
+   */
+  public QueryOptions filter(String filterStr) {
+    this.filter = filterStr;
     return this;
   }
 

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Api {
@@ -27,11 +26,12 @@ public abstract class Api {
     for (Map.Entry<String, Object> e : headers.entrySet()) {
       connection.setRequestProperty(e.getKey(), e.getValue().toString());
     }
-    if (logger.isLoggable(Level.INFO)) {
-      for (Map.Entry<String, Object> e : headers.entrySet()) {
-        logger.log(Level.INFO, String.format("Header:\t%s\t->\t%s", e.getKey(), e.getValue()));
-      }
-    }
+    // if (logger.isLoggable(Level.INFO)) {
+    // for (Map.Entry<String, Object> e : headers.entrySet()) {
+    // logger.log(Level.INFO, String.format("Header:\t%s\t->\t%s", e.getKey(),
+    // e.getValue()));
+    // }
+    // }
   }
 
 }
