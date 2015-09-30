@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>flowthings-client-core</artifactId>
-	<version>0.9.1</version>
+	<version>0.9.1.1</version>
 	<packaging>jar</packaging>
 
 	<name>Flowthings.io Java Client Core Library</name>
