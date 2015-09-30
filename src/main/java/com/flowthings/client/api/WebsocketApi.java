@@ -95,6 +95,10 @@ public class WebsocketApi {
     this(credentials, "ws.flowthings.io", true);
   }
 
+  public void close() {
+    socket.close();
+  }
+
   protected SimpleSocket connect() throws FlowthingsException {
     String sessionId = connectHttp();
     return connectWs(sessionId);
@@ -122,6 +126,7 @@ public class WebsocketApi {
       Future<Session> connect = client.connect(socket, serverUrl, request);
       System.out.printf("Connecting to : %s%n", serverUrl);
       connect.get();
+
       return socket;
     } catch (Throwable t) {
       throw new FlowthingsException(t);
@@ -171,6 +176,10 @@ public class WebsocketApi {
 
     public SimpleSocket() {
       this.closeLatch = new CountDownLatch(1);
+    }
+
+    public void close() {
+      session.close();
     }
 
     @OnWebSocketClose
