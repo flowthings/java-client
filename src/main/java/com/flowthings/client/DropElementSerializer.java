@@ -323,6 +323,17 @@ public abstract class DropElementSerializer<T> {
       return new JsonPrimitive(b);
     }
   };
+  protected static DropElementSerializer<Long> LONG = new DropElementSerializer<Long>("long") {
+    @Override
+    public Long from(String type, JsonElement e) {
+      return e.getAsLong();
+    }
+
+    @Override
+    public JsonElement toPrimitive(Long b) {
+      return new JsonPrimitive(b);
+    }
+  };
   protected static DropElementSerializer<Date> DATE = new DropElementSerializer<Date>("date") {
     @Override
     public Date from(String type, JsonElement e) {
