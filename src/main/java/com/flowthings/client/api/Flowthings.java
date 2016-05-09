@@ -17,10 +17,9 @@ import com.flowthings.client.domain.Track;
  * @author matt
  */
 public class Flowthings {
-
   private static MutableDomainObjectApi<ApiImporterTask> apiImporter = new MutableDomainObjectApi<>(
       ApiImporterTask.class);
-  private static DomainObjectApi<Device> device = new DomainObjectApi<>(Device.class);
+  private static MutableDomainObjectApi<Device> device = new DomainObjectApi<>(Device.class);
   private static MutableDomainObjectApi<Flow> flow = new MutableDomainObjectApi<>(Flow.class);
   private static MutableDomainObjectApi<Group> group = new MutableDomainObjectApi<>(Group.class);
   private static MutableDomainObjectApi<Identity> identity = new MutableDomainObjectApi<>(Identity.class);
@@ -35,7 +34,7 @@ public class Flowthings {
     return apiImporter;
   }
 
-  public static DomainObjectApi<Device> device() {
+  public static MutableDomainObjectApi<Device> device() {
     return device;
   }
 
@@ -77,5 +76,4 @@ public class Flowthings {
   public static MutableDomainObjectApi<Track> track() {
     return track;
   }
-
 }
