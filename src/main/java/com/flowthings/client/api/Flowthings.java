@@ -19,7 +19,7 @@ import com.flowthings.client.domain.Track;
 public class Flowthings {
   private static MutableDomainObjectApi<ApiImporterTask> apiImporter = new MutableDomainObjectApi<>(
       ApiImporterTask.class);
-  private static MutableDomainObjectApi<Device> device = new DomainObjectApi<>(Device.class);
+  private static MutableDomainObjectApi<Device> device = new MutableDomainObjectApi<>(Device.class);
   private static MutableDomainObjectApi<Flow> flow = new MutableDomainObjectApi<>(Flow.class);
   private static MutableDomainObjectApi<Group> group = new MutableDomainObjectApi<>(Group.class);
   private static MutableDomainObjectApi<Identity> identity = new MutableDomainObjectApi<>(Identity.class);
