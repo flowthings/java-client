@@ -5,6 +5,7 @@ import com.flowthings.client.domain.Device;
 import com.flowthings.client.domain.Flow;
 import com.flowthings.client.domain.Group;
 import com.flowthings.client.domain.Identity;
+import com.flowthings.client.domain.LocalTrack;
 import com.flowthings.client.domain.MqttConnection;
 import com.flowthings.client.domain.RssTask;
 import com.flowthings.client.domain.Share;
@@ -29,6 +30,7 @@ public class Flowthings {
   private static DomainObjectApi<Share> share = new DomainObjectApi<>(Share.class);
   private static DomainObjectApi<Token> token = new DomainObjectApi<>(Token.class);
   private static MutableDomainObjectApi<Track> track = new MutableDomainObjectApi<>(Track.class);
+  private static MutableDomainObjectApi<LocalTrack> localTrack = new MutableDomainObjectApi<>(LocalTrack.class);
 
   public static MutableDomainObjectApi<ApiImporterTask> apiImporter() {
     return apiImporter;
@@ -75,5 +77,9 @@ public class Flowthings {
 
   public static MutableDomainObjectApi<Track> track() {
     return track;
+  }
+
+  public static MutableDomainObjectApi<LocalTrack> localTrack() {
+    return localTrack;
   }
 }

@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.flowthings.client.Serializer;
 import com.flowthings.client.domain.ApiImporterTask;
 import com.flowthings.client.domain.Device;
 import com.flowthings.client.domain.Drop;
@@ -13,6 +12,7 @@ import com.flowthings.client.domain.Flow;
 import com.flowthings.client.domain.FlowDomainObject;
 import com.flowthings.client.domain.Group;
 import com.flowthings.client.domain.Identity;
+import com.flowthings.client.domain.LocalTrack;
 import com.flowthings.client.domain.MqttConnection;
 import com.flowthings.client.domain.RssTask;
 import com.flowthings.client.domain.Share;
@@ -86,6 +86,12 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
     testSerialize("/json/Track-Minimal.json", Track.class);
   }
 
+  @Test
+  public void testLocalTrack() {
+    testSerialize("/json/LocalTrack-Full.json", LocalTrack.class);
+    testSerialize("/json/LocalTrack-Minimal.json", LocalTrack.class);
+  }
+
   private static void testSerialize(String fileName, Class<? extends FlowDomainObject> klazz) {
     String json = readFromFile(fileName);
     Object o = Serializer.fromJson(json, klazz);
@@ -106,7 +112,6 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
       }
     }
   }
-
   // @Test
   // public void testFindBucketByKeywordDeserialization() {
   // String json = readFromFile("/json/FindBucketByKeywordResponse.json");
