@@ -2,9 +2,9 @@ package com.flowthings.client.domain;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Device extends FlowDomainObject {
-
   protected String displayName;
   protected String path;
   protected String tokenId;
@@ -12,6 +12,7 @@ public class Device extends FlowDomainObject {
   protected String status;
   protected Date lastSeen;
   protected Long reportPeriodicity;
+  protected HashMap<String, Map<String, Object>> tracks;
 
   public String getDisplayName() {
     return displayName;
@@ -67,6 +68,14 @@ public class Device extends FlowDomainObject {
 
   public void setReportPeriodicity(Long reportPeriodicity) {
     this.reportPeriodicity = reportPeriodicity;
+  }
+
+  public HashMap<String, Map<String, Object>> getTracks() {
+    return tracks;
+  }
+
+  public void setTracks(HashMap<String, Map<String, Object>> tracks) {
+    this.tracks = tracks;
   }
 
   @Override
