@@ -1,3 +1,11 @@
+v0.9.2.2 - 05/19/2015
+==============
+- Added type(s) supporting local tracks
+
+v0.9.2.0 - 05/11/2016
+==============
+- Added local tracks support
+
 v0.9.1.2 - 10/02/2015
 ==============
 - Add numeric-long deserializer
