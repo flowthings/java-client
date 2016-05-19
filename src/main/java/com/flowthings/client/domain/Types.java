@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.flowthings.client.response.ObjectResponse;
 import com.flowthings.client.response.ListResponse;
+import com.flowthings.client.response.ObjectResponse;
 import com.google.gson.reflect.TypeToken;
 
 public enum Types {
-
   API_IMPORTER_TASK(ApiImporterTask.class, "api-task", false, new TypeToken<ObjectResponse<ApiImporterTask>>() {
   }), DEVICE(Device.class, "device", false, new TypeToken<ObjectResponse<Device>>() {
   }), DROP(Drop.class, "drop", false, new TypeToken<ObjectResponse<Drop>>() {
@@ -23,8 +22,9 @@ public enum Types {
   }), SHARE(Share.class, "share", false, new TypeToken<ObjectResponse<Share>>() {
   }), TOKEN(Token.class, "token", false, new TypeToken<ObjectResponse<Token>>() {
   }), TRACK(Track.class, "track", false, new TypeToken<ObjectResponse<Track>>() {
+  }), LOCAL_TRACK(LocalTrack.class, "local-track", false, new TypeToken<ObjectResponse<LocalTrack>>() {
   }),
-
+  //
   API_IMPORTER_TASKS(ApiImporterTask.class, "api-task", true, new TypeToken<ListResponse<ApiImporterTask>>() {
   }), DEVICES(Device.class, "device", true, new TypeToken<ListResponse<Device>>() {
   }), DROPS(Drop.class, "drop", true, new TypeToken<ListResponse<Drop>>() {
@@ -36,8 +36,8 @@ public enum Types {
   }), SHARES(Share.class, "share", true, new TypeToken<ListResponse<Share>>() {
   }), TOKENS(Token.class, "token", true, new TypeToken<ListResponse<Token>>() {
   }), TRACKS(Track.class, "track", true, new TypeToken<ListResponse<Track>>() {
+  }), LOCAL_TRACKS(LocalTrack.class, "local-track", true, new TypeToken<ListResponse<LocalTrack>>() {
   });
-
   public final Class<? extends FlowDomainObject> klazz;
   public final Type tokenType;
   public final String name;
