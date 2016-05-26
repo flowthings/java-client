@@ -17,92 +17,73 @@ import com.flowthings.client.exception.AuthorizationException;
 import com.flowthings.client.exception.FlowthingsException;
 import com.flowthings.client.exception.NotFoundException;
 
+@SuppressWarnings("unused")
 public class RestApiTests {
-
   private static String accountName = "matt";
   private static String tokenString = "fWNhEOEJ2RdqoKiqOfLfYlDyNrCWCTBU";
-
   private static Credentials credentials = new Credentials(accountName, tokenString);
   private static RestApi api = new RestApi(credentials);
 
   @Test
   public void testFlows() throws FlowthingsException {
-
     /**
      * Flows
      */
     String path = "/" + accountName + "/test123456";
     Flow flow = new Flow.Builder().setPath(path).get();
-
     // Create
     flow = api.send(Flowthings.flow().create(flow));
     Assert.assertNotNull("Created", flow);
-
     // Get
     Flow got = api.send(Flowthings.flow().get(flow.getId()));
     Assert.assertEquals("Got", flow, got);
-
     // Find
     List<Flow> results = api.send(Flowthings.flow().find(new QueryOptions().filter("path==\"" + path + "\"")));
     Assert.assertEquals("Found", 1, results.size());
     Assert.assertEquals("Found", flow, results.get(0));
-
     // Update
     flow.setDescription("Now with all new descriptions!");
     Flow updated = api.send(Flowthings.flow().update(flow.getId(), flow));
     Assert.assertEquals("Updated", "Now with all new descriptions!", updated.getDescription());
-
     // Delete
     api.send(Flowthings.flow().delete(flow.getId()));
-
     // Get again
     try {
       got = api.send(Flowthings.flow().get(flow.getId()));
       Assert.fail();
     } catch (Exception e) {
-
     }
-
   }
 
   @Test
   public void testDrops() throws FlowthingsException {
-
     // (Create a test flow)
     String path = "/" + accountName + "/test123";
     Flow flow = new Flow.Builder().setPath(path).get();
     flow = api.send(Flowthings.flow().create(flow));
     Assert.assertNotNull("Created", flow);
     String flowId = flow.getId();
-
     /**
      * Drops
      */
     try {
-
       Drop drop = new Drop.Builder().addElem("foo", "bar").get();
-
       // Create
       drop = api.send(Flowthings.drop(flowId).create(drop));
       Assert.assertNotNull("Created", drop);
-
       // Get
       Drop got = api.send(Flowthings.drop(flowId).get(drop.getId()));
       Assert.assertEquals("Got", drop, got);
-
       // Find
       List<Drop> results = api.send(Flowthings.drop(flowId).find(new QueryOptions().filter("elems.foo==\"bar\"")));
       Assert.assertEquals("Found", 1, results.size());
       Assert.assertEquals("Found", drop, results.get(0));
-
       // Update
       drop.getElems().put("baz", 7);
       Drop updated = api.send(Flowthings.drop(flowId).update(drop.getId(), drop));
       Assert.assertEquals("Updated", 7, updated.getElems().get("baz"));
-
       // Delete
       api.send(Flowthings.drop(flowId).delete(drop.getId()));
-
       // Get again
       try {
         got = api.send(Flowthings.drop(flowId).get(drop.getId()));
@@ -110,20 +91,16 @@ public class RestApiTests {
       } catch (Exception e) {
         // Good
       }
-
       // Delete all drops
       api.send(Flowthings.drop(flowId).deleteAll());
     } finally {
-
       // (delete test flow)
       api.send(Flowthings.flow().delete(flowId));
     }
-
   }
 
   @Test
   public void testTokens() throws FlowthingsException {
-
     /**
      * Tokens (read only, not entirely symetrical)
      */
@@ -133,52 +110,39 @@ public class RestApiTests {
     flow = api.send(Flowthings.flow().create(flow));
     Assert.assertNotNull("Created", flow);
     String flowId = flow.getId();
-
     try {
       Token token = new Token.Builder().addPath(flow.getPath(), new TokenPermissions(true, false))
           .setDescription("description1").setDuration(120000l).get();
-
       // Create
       token = api.send(Flowthings.token().create(token));
       Assert.assertNotNull("Created", token);
-
       // Get
       Token got = api.send(Flowthings.token().get(token.getId()));
       Assert.assertEquals("Got", token, got);
       Assert.assertNotNull("Got expire", got.getExpiresInMs());
-
       // Find
-      List<Token> results = api.send(Flowthings.token()
-          .find(new QueryOptions().filter("description==\"description1\"")));
+      List<Token> results = api
+          .send(Flowthings.token().find(new QueryOptions().filter("description==\"description1\"")));
       Assert.assertEquals("Found", 1, results.size());
       Assert.assertEquals("Found", token, results.get(0));
-
       // Update not allowed
-
       // Delete
       api.send(Flowthings.token().delete(token.getId()));
-
       // Get again
       try {
         got = api.send(Flowthings.token().get(token.getId()));
         Assert.fail();
       } catch (Exception e) {
-
       }
-
     } finally {
-
       // (delete test flow)
       api.send(Flowthings.flow().delete(flowId));
     }
-
   }
 
   @Test
   public void test403() throws FlowthingsException {
-
     RestApi api = new RestApi(new Credentials("nope", "nooo"));
-
     List<Flow> r1 = null;
     try {
       r1 = api.send(Flowthings.flow().find());
@@ -190,10 +154,8 @@ public class RestApiTests {
   // if (flowId == null) {
   // throw new NullPointerException("FlowId must not be null");
   // }
-
   @Test
   public void test404() throws FlowthingsException {
-
     Flow r2 = null;
     try {
       // This flow doesn't exist

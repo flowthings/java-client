@@ -41,22 +41,17 @@ import com.flowthings.client.response.Response;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.reflect.TypeToken;
 
+@SuppressWarnings("unchecked")
 public class WebsocketApi {
-
   private static Map<Request.Action, String> methods = new HashMap<>();
-
   private String host;
   private boolean secure;
   private SimpleSocket socket;
   private RestApi restApi;
-
   private Random random;
-
   ConcurrentHashMap<String, WSCallback> callbacks = new ConcurrentHashMap<>();
   ConcurrentHashMap<String, SubscriptionCallback<Drop>> subscriptions = new ConcurrentHashMap<>();
-
   ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
   static {
     methods.put(Request.Action.CREATE, "create");
     methods.put(Request.Action.DELETE, "delete");
@@ -70,10 +65,8 @@ public class WebsocketApi {
   public WebsocketApi(final Credentials credentials, String host, boolean secure) throws FlowthingsException {
     this.host = host;
     this.secure = secure;
-
     final String transport = secure ? "https://" : "http://";
     final String url = transport + host;
-
     this.restApi = new RestApi(credentials, url) {
       @Override
       protected void setRequestProperties(URLConnection connection, Map<String, Object> headers) {
@@ -108,7 +101,6 @@ public class WebsocketApi {
     // TODO: Proper type for this
     Request<Drop> sessionRequest = new Request<>(Action.CREATE, Types.DROP, Types.DROP.token, false);
     Drop response = restApi.send(sessionRequest);
-
     return response.getId();
   }
 
@@ -116,7 +108,6 @@ public class WebsocketApi {
     String transport = secure ? "wss://" : "ws://";
     String url = transport + host + "/session/" + sessionId + "/ws";
     SslContextFactory ssl = new SslContextFactory();
-
     WebSocketClient client = secure ? new WebSocketClient(ssl) : new WebSocketClient();
     try {
       client.start();
@@ -126,7 +117,6 @@ public class WebsocketApi {
       Future<Session> connect = client.connect(socket, serverUrl, request);
       System.out.printf("Connecting to : %s%n", serverUrl);
       connect.get();
-
       return socket;
     } catch (Throwable t) {
       throw new FlowthingsException(t);
@@ -134,44 +124,34 @@ public class WebsocketApi {
   }
 
   public <S> Future<S> send(Request<S> request) throws FlowthingsException {
-
     WebsocketRequest<S> wsr = new WebsocketRequest<>();
     wsr.setType(methods.get(request.action));
     wsr.setMsgId("" + random.nextInt());
     wsr.setObject(request.type.name);
     wsr.setFlowId(request.flowId);
     wsr.setValue(request.bodyObject);
-
     String value = Serializer.toJson(wsr);
-
     if (request.action == Action.SUBSCRIBE) {
       SubscriptionCallback<Drop> callback = (SubscriptionCallback<Drop>) request.otherData.get("callback");
       subscriptions.put(request.flowId, callback);
     } else if (request.action == Action.UNSUBSCRIBE) {
       subscriptions.remove(request.flowId);
     }
-
     // Send
     socket.send(value);
-
     // Register a callback
     SettableFuture<S> future = SettableFuture.create();
     WSCallback callback = new WSCallback(future, request.type);
     callbacks.put(wsr.getMsgId(), callback);
-
     return future;
   }
 
   @WebSocket(maxTextMessageSize = 1024 * 1024)
   public class SimpleSocket {
-
     protected static final String heartbeat = "{\"type\" : \"heartbeat\"}";
-
     private final CountDownLatch closeLatch;
-
     @SuppressWarnings("unused")
     private Session session;
-
     private ScheduledFuture<?> heartbeatHandle;
 
     public SimpleSocket() {
@@ -215,20 +195,17 @@ public class WebsocketApi {
 
     @OnWebSocketMessage
     public void onMessage(String msg) {
-
       // Deserialize
       // TODO - greatly improve this
       WebsocketsResponse r = null;
       try {
         r = Serializer.fromJson(msg, new TypeToken<WebsocketsResponse>() {
         });
-
         // Must be a drop message
         if (r.getHead() == null) {
           try {
             WebsocketsDropResponse r1 = Serializer.fromJson(msg, new TypeToken<WebsocketsDropResponse>() {
             });
-
             if (r1.getResource() != null) {
               SubscriptionCallback<Drop> callback = subscriptions.get(r1.getResource());
               if (callback != null) {
@@ -236,15 +213,12 @@ public class WebsocketApi {
                 return;
               }
             }
-
             System.out.println("Recieved message but didn't know what to do with it: " + msg);
-
           } catch (Exception e1) {
             e1.printStackTrace();
           }
           return;
         }
-
         String msgId = r.getHead().getMsgId();
         if (msgId != null) {
           WSCallback wsCallback = callbacks.get(msgId);
@@ -252,7 +226,6 @@ public class WebsocketApi {
           if (wsCallback != null) {
             SettableFuture future = wsCallback.future;
             Object response = Serializer.fromJson(msg, wsCallback.type.token);
-
             int status = ((Response) response).getHead().getStatus();
             if (((Response) response).getHead().isOk()) {
               future.set(((Response) response).getBody());
@@ -263,7 +236,6 @@ public class WebsocketApi {
             } else {
               future.setException(new BadRequestException(((Response) response).getHead().getErrors().get(0)));
             }
-
             callbacks.remove(msgId);
           }
         }
@@ -282,7 +254,5 @@ public class WebsocketApi {
       this.future = future;
       this.type = type;
     }
-
   }
-
 }

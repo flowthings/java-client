@@ -99,8 +99,8 @@ public abstract class DropElementSerializer<T> {
       }
     }
     if (s == null) {
-      throw new UnsupportedOperationException("Don't know how to create json from Object " + o + " of type "
-          + o.getClass());
+      throw new UnsupportedOperationException(
+          "Don't know how to create json from Object " + o + " of type " + o.getClass());
     }
     return s.to(o);
   }
@@ -119,9 +119,9 @@ public abstract class DropElementSerializer<T> {
       "map", "sortedMap") {
     private Map<String, Object> newInstance(String type) {
       if ("sortedMap".equals(type)) {
-        return new TreeMap<String, Object>();
+        return new TreeMap<>();
       }
-      return new HashMap<String, Object>();
+      return new HashMap<>();
     }
 
     @Override
@@ -152,7 +152,6 @@ public abstract class DropElementSerializer<T> {
     }
   };
   protected static DropElementSerializer<MapLike> MAPLIKE = new DropElementSerializer<MapLike>("text", "media") {
-
     @Override
     protected String getTypeKey(MapLike e) {
       return e.getType();
@@ -178,7 +177,6 @@ public abstract class DropElementSerializer<T> {
     }
   };
   protected static DropElementSerializer<Length> LENGTH = new DropElementSerializer<Length>("length") {
-
     @Override
     protected String getTypeKey(Length e) {
       return "length";
@@ -189,10 +187,8 @@ public abstract class DropElementSerializer<T> {
       JsonObject c = elem.getAsJsonObject();
       JsonElement unitsJ = c.get("unit");
       JsonElement magnitudeJ = c.get("magnitude");
-
-      String units = unitsJ == null ? null : unitsJ.getAsString();
+      String units = unitsJ == null ? "METERS" : unitsJ.getAsString();
       Double magnitude = magnitudeJ == null ? 0.0 : magnitudeJ.getAsDouble();
-
       Length l = new Length(Length.Units.valueOf(units.toUpperCase()), magnitude);
       return l;
     }
@@ -205,9 +201,7 @@ public abstract class DropElementSerializer<T> {
       return jo;
     }
   };
-
   protected static DropElementSerializer<Duration> DURATION = new DropElementSerializer<Duration>("duration") {
-
     @Override
     protected String getTypeKey(Duration e) {
       return "duration";
@@ -218,10 +212,8 @@ public abstract class DropElementSerializer<T> {
       JsonObject c = elem.getAsJsonObject();
       JsonElement unitsJ = c.get("unit");
       JsonElement magnitudeJ = c.get("magnitude");
-
-      String units = unitsJ == null ? null : unitsJ.getAsString();
+      String units = unitsJ == null ? "MILLISECONDS" : unitsJ.getAsString();
       Double magnitude = magnitudeJ == null ? 0.0 : magnitudeJ.getAsDouble();
-
       Duration l = new Duration(Duration.Units.valueOf(units.toUpperCase()), magnitude);
       return l;
     }
@@ -241,12 +233,12 @@ public abstract class DropElementSerializer<T> {
       "list", "set", "sortedSet") {
     private Collection<Object> newInstance(String type) {
       if ("set".equals(type)) {
-        return new HashSet<Object>();
+        return new HashSet<>();
       }
       if ("sortedSet".equals(type)) {
-        return new TreeSet<Object>();
+        return new TreeSet<>();
       }
-      return new ArrayList<Object>();
+      return new ArrayList<>();
     }
 
     @Override
@@ -278,7 +270,6 @@ public abstract class DropElementSerializer<T> {
       return ja;
     }
   };
-
   protected static DropElementSerializer<String> STRING = new DropElementSerializer<String>("string") {
     @Override
     public JsonElement toPrimitive(String b) {
@@ -385,7 +376,7 @@ public abstract class DropElementSerializer<T> {
       return o;
     }
   };
-  static final HashMap<Object, DropElementSerializer<?>> serializerMap = new HashMap<Object, DropElementSerializer<?>>();
+  static final HashMap<Object, DropElementSerializer<?>> serializerMap = new HashMap<>();
   static {
     for (Field f : DropElementSerializer.class.getDeclaredFields()) {
       if (DropElementSerializer.class.isAssignableFrom(f.getType())) {

@@ -41,13 +41,13 @@ public enum Types {
   public final Class<? extends FlowDomainObject> klazz;
   public final Type tokenType;
   public final String name;
-  private final TreeMap<String, TypeToken> fieldTokens = new TreeMap<String, TypeToken>();
+  private final TreeMap<String, TypeToken> fieldTokens = new TreeMap<>();
   private boolean listType;
   public TypeToken token;
-  private static HashMap<Class, Types> fromClassMap = new HashMap<Class, Types>();
-  private static TreeMap<String, Types> fromNameMap = new TreeMap<String, Types>();
-  private static Map<Class, Types> fromListClassMap = new HashMap<Class, Types>();
-  private static Map<String, Types> fromListNameMap = new TreeMap<String, Types>();
+  private static HashMap<Class, Types> fromClassMap = new HashMap<>();
+  private static TreeMap<String, Types> fromNameMap = new TreeMap<>();
+  private static Map<Class, Types> fromListClassMap = new HashMap<>();
+  private static Map<String, Types> fromListNameMap = new TreeMap<>();
   static {
     for (Types t : Types.class.getEnumConstants()) {
       try {
