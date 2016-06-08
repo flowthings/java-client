@@ -16,6 +16,7 @@ import com.flowthings.client.Header;
 import com.flowthings.client.Serializer;
 import com.flowthings.client.exception.AuthorizationException;
 import com.flowthings.client.exception.BadRequestException;
+import com.flowthings.client.exception.ConnectionRefusedException;
 import com.flowthings.client.exception.FlowthingsException;
 import com.flowthings.client.exception.NotFoundException;
 import com.flowthings.client.response.ListResponse;
@@ -28,13 +29,10 @@ import com.flowthings.client.response.Response;
  * @author matt
  */
 public class RestApi extends Api {
-
   protected static Logger logger = Logger.getLogger("com.flow.client.api.RestApi");
-
   private Credentials credentials;
   private String url;
   private static Map<Request.Action, String> methods = new HashMap<>();
-
   static {
     methods.put(Request.Action.CREATE, "POST");
     methods.put(Request.Action.DELETE, "DELETE");
@@ -54,31 +52,25 @@ public class RestApi extends Api {
 
   @SuppressWarnings("unchecked")
   public <S> S send(Request<S> request) throws FlowthingsException {
-
     try {
       String queryString = toQueryString(request.buildHttpPath(credentials, url), request.queryOptions.toMap());
       HttpURLConnection connection = (HttpURLConnection) (new URL(queryString).openConnection());
       String method = methods.get(request.action);
-
       if (method == null) {
         throw new FlowthingsException("Cannot send " + request.action + " using the RestAPI");
       }
-
       Map<String, Object> headers = new Header(credentials).toMap();
       setRequestProperties(connection, headers);
       connection.setDoInput(true);
       connection.setRequestMethod(method.toString());
-
       if (request.body != null) {
         connection.setDoOutput(true);
         try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
           // logger.log(Level.INFO, request.body);
-
           out.writeBytes(request.body);
           out.flush();
         }
       }
-
       // Todo - big cleanup here
       String stringResponse = null;
       try {
@@ -94,10 +86,12 @@ public class RestApi extends Api {
         } else {
           throw new BadRequestException(response.getHead().getErrors().get(0));
         }
+      } catch (java.net.ConnectException e) {
+        throw new ConnectionRefusedException(String.format("Error connecting to %s: %s", url, e.getMessage()));
       } catch (Exception e) {
         stringResponse = collectResponse(connection.getErrorStream());
-        Response<S> response = Serializer.fromJson(stringResponse, request.listResponse ? ListResponse.ERROR.class
-            : ObjectResponse.ERROR.class);
+        Response<S> response = Serializer.fromJson(stringResponse,
+            request.listResponse ? ListResponse.ERROR.class : ObjectResponse.ERROR.class);
         int status = response.getHead().getStatus();
         if (status == 404) {
           throw new NotFoundException(response.getHead().getErrors().get(0));
@@ -126,5 +120,4 @@ public class RestApi extends Api {
     }
     return b.toString();
   }
-
 }
