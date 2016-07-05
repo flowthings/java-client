@@ -1,6 +1,7 @@
 package com.flowthings.client;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import junit.framework.Assert;
 
@@ -68,26 +69,32 @@ public class RestApiTests {
      */
     try {
       Drop drop = new Drop.Builder().addElem("foo", "bar").get();
+      Drop drop2 = new Drop.Builder().addElem("foo", "bar").get();
       // Create
       drop = api.send(Flowthings.drop(flowId).create(drop));
+      drop2 = api.send(Flowthings.dropFromPath(path).create(drop2));
       Assert.assertNotNull("Created", drop);
+      Assert.assertNotNull("Created", drop2);
       // Get
       Drop got = api.send(Flowthings.drop(flowId).get(drop.getId()));
       Assert.assertEquals("Got", drop, got);
+      got = api.send(Flowthings.drop(flowId).get(drop2.getId()));
+      Assert.assertEquals("Got", drop2, got);
       // Find
       List<Drop> results = api.send(Flowthings.drop(flowId).find(new QueryOptions().filter("elems.foo==\"bar\"")));
-      Assert.assertEquals("Found", 1, results.size());
-      Assert.assertEquals("Found", drop, results.get(0));
+      Assert.assertEquals("Found", 2, results.size());
       // Update
       drop.getElems().put("baz", 7);
       Drop updated = api.send(Flowthings.drop(flowId).update(drop.getId(), drop));
       Assert.assertEquals("Updated", 7, updated.getElems().get("baz"));
       // Delete
       api.send(Flowthings.drop(flowId).delete(drop.getId()));
+      api.send(Flowthings.drop(flowId).delete(drop2.getId()));
       // Get again
       try {
         got = api.send(Flowthings.drop(flowId).get(drop.getId()));
         Assert.fail();
+        got = api.send(Flowthings.drop(flowId).get(drop2.getId()));
       } catch (Exception e) {
         // Good
       }
@@ -151,9 +158,16 @@ public class RestApiTests {
     }
   }
 
-  // if (flowId == null) {
-  // throw new NullPointerException("FlowId must not be null");
-  // }
+  @Test
+  public void test403Async() throws FlowthingsException {
+    RestApi api = new RestApi(new Credentials("nope", "nooo"));
+    List<Flow> r1 = null;
+    try {
+      r1 = api.sendAsync(Flowthings.flow().find()).grab();
+      Assert.fail("Should have thrown exception");
+    } catch (AuthorizationException e) {}
+  }
+
   @Test
   public void test404() throws FlowthingsException {
     Flow r2 = null;
@@ -166,10 +180,31 @@ public class RestApiTests {
   }
 
   @Test
+  public void test404Async() throws FlowthingsException {
+    Flow r2 = null;
+    try {
+      // This flow doesn't exist
+      r2 = api.sendAsync(Flowthings.flow().get("ff551ac39bd4c6c0000000000")).grab();
+      Assert.fail("Should have thrown exception");
+    } catch (NotFoundException e) {
+    }
+  }
+
+  @Test
   public void testNoFlowId() throws FlowthingsException {
     List<Drop> r1 = null;
     try {
       r1 = api.send(Flowthings.drop(null).find());
+      Assert.fail("Should have thrown exception");
+    } catch (NullPointerException e) {
+    }
+  }
+
+  @Test
+  public void testNoFlowIdAsync() throws FlowthingsException {
+    List<Drop> r1 = null;
+    try {
+      r1 = api.sendAsync(Flowthings.drop(null).find()).grab();
       Assert.fail("Should have thrown exception");
     } catch (NullPointerException e) {
     }

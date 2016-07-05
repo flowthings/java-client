@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.flowthings.client.exception.NotFoundException;
 import org.junit.Test;
 
 import com.flowthings.client.api.Flowthings;
@@ -33,6 +34,24 @@ public class WebsocketsApiTests {
     }
   }
 
+//  @Test
+//  public void testDisconnection() throws Exception {
+//    WebsocketApi api = new WebsocketApi(new Credentials("alice", "2R5xwhmlmb9r6z90XCUYqOu1ScJJuPMr"), "localhost:17890", false);
+//    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde0").subscribe(new SubscriptionCallback<Drop>() {
+//      @Override
+//      public void onMessage(Drop drop) {
+//        System.out.println("One");
+//      }
+//    }));
+//    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde2").subscribe(new SubscriptionCallback<Drop>() {
+//      @Override
+//      public void onMessage(Drop drop) {
+//        System.out.println("Two");
+//      }
+//    }));
+//    Thread.sleep(1000 * 1000 * 1000);
+//  }
+
   @Test
   public void testSubscribe() throws FlowthingsException, InterruptedException, ExecutionException {
     final CountDownLatch latch = new CountDownLatch(1);
@@ -40,7 +59,7 @@ public class WebsocketsApiTests {
     /**
      * Create a test flow
      */
-    String path = "/" + accountName + "/test3885";
+    String path = "/" + accountName + "/test3887";
     Flow flow = new Flow.Builder().setPath(path).get();
     // Create
     Future<Flow> response = api.send(Flowthings.flow().create(flow));
@@ -90,10 +109,10 @@ public class WebsocketsApiTests {
     Drop r2 = null;
     try {
       // This flow doesn't exist
-      r2 = api.send(Flowthings.drop("ff551ac39bd4c6c0000000000").get("df551ac39bd4c6c0000000000")).get();
+      r2 = api.send(Flowthings.drop("ff551ac39bd4c6c0000000000").get("df551ac39bd4c6c0000000000")).grab();
       System.out.println("R2 is: " + r2);
       Assert.fail("Should have thrown exception");
-    } catch (ExecutionException e) {
+    } catch (NotFoundException e) {
     }
   }
 

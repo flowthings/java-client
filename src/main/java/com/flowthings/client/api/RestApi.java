@@ -9,6 +9,10 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import com.flowthings.client.Credentials;
@@ -30,6 +34,7 @@ import com.flowthings.client.response.Response;
  */
 public class RestApi extends Api {
   protected static Logger logger = Logger.getLogger("com.flow.client.api.RestApi");
+  private final ExecutorService pool;
   private Credentials credentials;
   private String url;
   private static Map<Request.Action, String> methods = new HashMap<>();
@@ -42,12 +47,14 @@ public class RestApi extends Api {
   }
 
   public RestApi(Credentials credentials) {
-    this(credentials, "https://api.flowthings.io/v0.1");
+    this(credentials, "api.flowthings.io/v0.1", true);
   }
 
-  public RestApi(Credentials credentials, String url) {
+  public RestApi(Credentials credentials, String host, boolean secure) {
     this.credentials = credentials;
-    this.url = url;
+    final String transport = secure ? "https://" : "http://";
+    this.url = transport + host;
+    this.pool = Executors.newCachedThreadPool();
   }
 
   @SuppressWarnings("unchecked")
@@ -104,6 +111,16 @@ public class RestApi extends Api {
     } catch (IOException e) {
       throw new FlowthingsException(e);
     }
+  }
+
+  @Override
+  public <S> FlowthingsFuture<S> sendAsync(final Request<S> request){
+    return new FlowthingsFuture<>(pool.submit(new Callable<S>() {
+      @Override
+      public S call() throws Exception {
+          return send(request);
+      }
+    }));
   }
 
   protected String toQueryString(String url, Map<String, String> parameters) throws UnsupportedEncodingException {

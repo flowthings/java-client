@@ -67,6 +67,13 @@ public class Flowthings {
     return new DropApi(flowId);
   }
 
+  public static DropFromPathApi dropFromPath(String path) {
+    if (path == null) {
+      throw new NullPointerException("Path must not be null");
+    }
+    return new DropFromPathApi(path);
+  }
+
   public static MutableDomainObjectApi<Flow> flow() {
     return flow;
   }

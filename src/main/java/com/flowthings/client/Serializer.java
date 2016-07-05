@@ -2,17 +2,14 @@ package com.flowthings.client;
 
 import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.flowthings.client.domain.DropElementsMap;
-import com.flowthings.client.domain.FlowDomainObject;
-import com.flowthings.client.domain.Permissions;
-import com.flowthings.client.domain.TokenPermissions;
-import com.flowthings.client.domain.Types;
+import com.flowthings.client.domain.*;
 import com.flowthings.client.response.ListResponse;
 import com.flowthings.client.response.MapResponse;
 import com.flowthings.client.response.ObjectResponse;
@@ -30,6 +27,7 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 public class Serializer {
+
   protected static Logger logger = Logger.getLogger("com.flow.client.Serializer");
   public static Gson gson = createGsonSerializer();
   private static TypeToken<ParseToken> innerParseToken = new TypeToken<ParseToken>() {

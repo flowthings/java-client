@@ -1,11 +1,14 @@
 package com.flowthings.client.api;
 
+import com.flowthings.client.exception.FlowthingsException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 public abstract class Api {
@@ -33,5 +36,10 @@ public abstract class Api {
     // }
     // }
   }
+
+  /**
+   * A consistent interface for sending requests via multiple APIs
+   */
+  public abstract <S> FlowthingsFuture<S> sendAsync(final Request<S> request);
 
 }
