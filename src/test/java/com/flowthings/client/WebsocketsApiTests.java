@@ -34,23 +34,32 @@ public class WebsocketsApiTests {
     }
   }
 
-//  @Test
-//  public void testDisconnection() throws Exception {
-//    WebsocketApi api = new WebsocketApi(new Credentials("alice", "2R5xwhmlmb9r6z90XCUYqOu1ScJJuPMr"), "localhost:17890", false);
-//    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde0").subscribe(new SubscriptionCallback<Drop>() {
-//      @Override
-//      public void onMessage(Drop drop) {
-//        System.out.println("One");
-//      }
-//    }));
-//    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde2").subscribe(new SubscriptionCallback<Drop>() {
-//      @Override
-//      public void onMessage(Drop drop) {
-//        System.out.println("Two");
-//      }
-//    }));
-//    Thread.sleep(1000 * 1000 * 1000);
-//  }
+  @Test
+  public void testDisconnection() throws Exception {
+    WebsocketApi api = new WebsocketApi(new Credentials("alice", "2R5xwhmlmb9r6z90XCUYqOu1ScJJuPMr"), "localhost:17890", false);
+    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde0").subscribe(new SubscriptionCallback<Drop>() {
+      @Override
+      public void onMessage(Drop drop) {
+        System.out.println("One");
+      }
+    }));
+    api.send(Flowthings.drop("f55ef2e3ad515290ae135fde2").subscribe(new SubscriptionCallback<Drop>() {
+      @Override
+      public void onMessage(Drop drop) {
+        System.out.println("Two");
+      }
+    }));
+    while (true){
+      Thread.sleep(1000);
+      try {
+        List<Flow> results = api.send(Flowthings.flow().find()).grab();
+        System.out.println("Got " + results.size() + " results");
+      } catch (FlowthingsException e) {
+        e.printStackTrace();
+      }
+    }
+
+  }
 
   @Test
   public void testSubscribe() throws FlowthingsException, InterruptedException, ExecutionException {

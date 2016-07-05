@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
 
+import com.flowthings.client.exception.*;
 import com.google.common.util.concurrent.Futures;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
@@ -28,10 +29,6 @@ import com.flowthings.client.Serializer;
 import com.flowthings.client.api.Request.Action;
 import com.flowthings.client.domain.Drop;
 import com.flowthings.client.domain.Types;
-import com.flowthings.client.exception.AuthorizationException;
-import com.flowthings.client.exception.BadRequestException;
-import com.flowthings.client.exception.FlowthingsException;
-import com.flowthings.client.exception.NotFoundException;
 import com.flowthings.client.response.Response;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.reflect.TypeToken;
@@ -45,10 +42,12 @@ public class WebsocketApi extends Api {
   private RestApi restApi;
   private Random random;
   private int retryDelay = 5;
+  private CountDownLatch reconnectLatch = new CountDownLatch(1);
   boolean reconnect = true;
   ConcurrentHashMap<String, WSCallback> callbacks = new ConcurrentHashMap<>();
   ConcurrentHashMap<String, SubscriptionCallback<Drop>> subscriptions = new ConcurrentHashMap<>();
   ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
 
   static {
     methods.put(Request.Action.CREATE, "create");
@@ -92,6 +91,10 @@ public class WebsocketApi extends Api {
           }
           System.out.printf("Lost WS Connection\n");
           socket.close();
+          reconnectLatch = new CountDownLatch(1);
+
+          // Kill any futures which will now never get a result
+          killAllFutures();
 
           while (reconnect) {
             try {
@@ -113,6 +116,14 @@ public class WebsocketApi extends Api {
     }).start();
   }
 
+  private void killAllFutures() {
+    for (String k : callbacks.keySet()){
+      WSCallback wsCallback = callbacks.get(k);
+      wsCallback.future.setException(new ConnectionLostException());
+    }
+    callbacks.clear();
+  }
+
   public WebsocketApi(Credentials credentials) throws FlowthingsException {
     this(credentials, "ws.flowthings.io", true);
   }
@@ -124,7 +135,9 @@ public class WebsocketApi extends Api {
 
   protected SimpleSocket connect() throws FlowthingsException {
     String sessionId = connectHttp();
-    return connectWs(sessionId);
+    SimpleSocket socket = connectWs(sessionId);
+    reconnectLatch.countDown();
+    return socket;
   }
 
   protected String connectHttp() throws FlowthingsException {
@@ -154,6 +167,11 @@ public class WebsocketApi extends Api {
   }
 
   public <S> FlowthingsFuture<S> send(Request<S> request) {
+    try {
+      reconnectLatch.await();
+    } catch (InterruptedException e) {
+      // Not sure
+    }
     WebsocketRequest<S> wsr = new WebsocketRequest<>();
     wsr.setType(methods.get(request.action));
     wsr.setMsgId("" + random.nextInt());
