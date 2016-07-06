@@ -31,7 +31,7 @@ public class MockWebsocketApiTest {
      */
     final MockWebsocketApi api = new MockWebsocketApi(true);
     api.retryDelayMs = 500;
-    api.setAnswer(Flowthings.device().get("v5758799c9e5273467374d820"), d);
+    api.setAnswerImmediately(Flowthings.device().get("v5758799c9e5273467374d820"), d);
     api.start();
 
     // Device returns

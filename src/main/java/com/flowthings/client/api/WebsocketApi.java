@@ -8,6 +8,7 @@ package com.flowthings.client.api;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -80,7 +81,7 @@ public class WebsocketApi extends Api {
 
   }
 
-  public void start() throws FlowthingsException {
+  public WebsocketApi start() throws FlowthingsException {
     this.socket = establish();
 
     new Thread(new Runnable() {
@@ -118,6 +119,7 @@ public class WebsocketApi extends Api {
       }
 
     }).start();
+    return this;
   }
 
   private void killAllFutures() {
@@ -146,7 +148,13 @@ public class WebsocketApi extends Api {
 
   protected String connectHttp() throws FlowthingsException {
     Request<Drop> sessionRequest = new Request<>(Action.CREATE, Types.DROP, Types.DROP.token, false);
-    Drop response = restApi.send(sessionRequest);
+    Drop response;
+    try {
+      response = restApi.send(sessionRequest);
+    } catch (BadRequestException e){
+      // FIX - This should be 403, not 400
+      throw new AuthorizationException(e);
+    }
     return response.getId();
   }
 
@@ -211,6 +219,11 @@ public class WebsocketApi extends Api {
     return send(request);
   }
 
+  @Override
+  public boolean supportsSubscribe() {
+    return true;
+  }
+
   private void resubscribeAll() {
     for (String flowId : subscriptions.keySet()){
       SubscriptionCallback<Drop> dropSubscriptionCallback = subscriptions.get(flowId);
@@ -242,7 +255,14 @@ public class WebsocketApi extends Api {
       SettableFuture future = wsCallback.future;
       int status = response.getHead().getStatus();
       if (response.getHead().isOk()) {
-        future.set(response.getBody());
+
+        // Workaround - WS will sometimes send null rather than empty-list
+        if (response.getBody() == null && wsCallback.type.isListType()){
+          future.set(new ArrayList());
+        } else {
+          future.set(response.getBody());
+        }
+
       } else if (status == 404) {
         future.setException(new NotFoundException(response.getHead().getErrors().get(0)));
       } else if (status == 403) {

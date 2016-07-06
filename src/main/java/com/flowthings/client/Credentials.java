@@ -50,6 +50,10 @@ public class Credentials {
   public Credentials() {
   }
 
+  public boolean masterTokenSupplied(){
+    return token != null && token.length() == 32;
+  }
+
   @Override
   public String toString() {
     return "Credentials [account=" + account + ", token=" + token + "]";

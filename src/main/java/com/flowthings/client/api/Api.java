@@ -42,4 +42,6 @@ public abstract class Api {
    */
   public abstract <S> FlowthingsFuture<S> sendAsync(final Request<S> request);
 
+  public abstract boolean supportsSubscribe();
+
 }

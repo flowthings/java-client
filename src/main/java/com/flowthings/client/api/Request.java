@@ -143,8 +143,6 @@ public class Request<S> {
     if (id != null ? !id.equals(request.id) : request.id != null) return false;
     if (queryOptions != null ? !queryOptions.equals(request.queryOptions) : request.queryOptions != null)
       return false;
-    if (body != null ? !body.equals(request.body) : request.body != null)
-      return false;
     if (typeToken != null ? !typeToken.equals(request.typeToken) : request.typeToken != null)
       return false;
     if (action != request.action) return false;
@@ -152,8 +150,6 @@ public class Request<S> {
     if (member != null ? !member.equals(request.member) : request.member != null)
       return false;
     if (flowId != null ? !flowId.equals(request.flowId) : request.flowId != null)
-      return false;
-    if (bodyObject != null ? !bodyObject.equals(request.bodyObject) : request.bodyObject != null)
       return false;
     return !(otherData != null ? !otherData.equals(request.otherData) : request.otherData != null);
 
@@ -163,14 +159,12 @@ public class Request<S> {
   public int hashCode() {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (queryOptions != null ? queryOptions.hashCode() : 0);
-    result = 31 * result + (body != null ? body.hashCode() : 0);
     result = 31 * result + (typeToken != null ? typeToken.hashCode() : 0);
     result = 31 * result + (action != null ? action.hashCode() : 0);
     result = 31 * result + (type != null ? type.hashCode() : 0);
     result = 31 * result + (member != null ? member.hashCode() : 0);
     result = 31 * result + (flowId != null ? flowId.hashCode() : 0);
     result = 31 * result + (listResponse ? 1 : 0);
-    result = 31 * result + (bodyObject != null ? bodyObject.hashCode() : 0);
     result = 31 * result + (otherData != null ? otherData.hashCode() : 0);
     return result;
   }

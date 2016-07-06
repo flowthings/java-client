@@ -97,16 +97,31 @@ public class RestApi extends Api {
         throw new ConnectionRefusedException(String.format("Error connecting to %s: %s", url, e.getMessage()));
       } catch (Exception e) {
         stringResponse = collectResponse(connection.getErrorStream());
-        Response<S> response = Serializer.fromJson(stringResponse,
-            request.listResponse ? ListResponse.ERROR.class : ObjectResponse.ERROR.class);
-        int status = response.getHead().getStatus();
-        if (status == 404) {
-          throw new NotFoundException(response.getHead().getErrors().get(0));
-        } else if (status == 403) {
-          throw new AuthorizationException(response.getHead().getErrors().get(0));
+
+        // Messy
+        if (request.listResponse){
+          Response response = Serializer.fromJson(stringResponse, ListResponse.ERROR.class);
+          int status = response.getHead().getStatus();
+          if (status == 404) {
+            throw new NotFoundException(response.getHead().getErrors().get(0));
+          } else if (status == 403) {
+            throw new AuthorizationException(response.getHead().getErrors().get(0));
+          } else {
+            throw new BadRequestException(response.getHead().getErrors().get(0));
+          }
+
         } else {
-          throw new BadRequestException(response.getHead().getErrors().get(0));
+          Response response = Serializer.fromJson(stringResponse, ObjectResponse.ERROR.class);
+          int status = response.getHead().getStatus();
+          if (status == 404) {
+            throw new NotFoundException(response.getHead().getErrors().get(0));
+          } else if (status == 403) {
+            throw new AuthorizationException(response.getHead().getErrors().get(0));
+          } else {
+            throw new BadRequestException(response.getHead().getErrors().get(0));
+          }
         }
+
       }
     } catch (IOException e) {
       throw new FlowthingsException(e);
@@ -121,6 +136,10 @@ public class RestApi extends Api {
           return send(request);
       }
     }));
+  }
+
+  public boolean supportsSubscribe() {
+    return false;
   }
 
   protected String toQueryString(String url, Map<String, String> parameters) throws UnsupportedEncodingException {

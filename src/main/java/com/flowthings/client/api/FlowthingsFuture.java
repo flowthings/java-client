@@ -17,14 +17,14 @@ public class FlowthingsFuture<T> implements Future<T> {
 
   private final Future<T> inner;
 
-  protected FlowthingsFuture(Future<T> inner){
+  public FlowthingsFuture(Future<T> inner){
     this.inner = inner;
   }
 
-  protected static <S> FlowthingsFuture<S> fromResult(S result){
+  public static <S> FlowthingsFuture<S> fromResult(S result){
     return new FlowthingsFuture<>(Futures.immediateFuture(result));
   }
-  protected static <S> FlowthingsFuture<S> fromException(FlowthingsException e){
+  public static <S> FlowthingsFuture<S> fromException(FlowthingsException e){
     return new FlowthingsFuture<>(Futures.<S>immediateFailedFuture(e));
   }
 

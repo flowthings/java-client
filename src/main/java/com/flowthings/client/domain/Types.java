@@ -106,4 +106,8 @@ public enum Types {
   public static Types fromListName(String name) {
     return fromListNameMap.get(name);
   }
+
+  public boolean isListType(){
+    return listType;
+  }
 }

@@ -10,7 +10,8 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A utility class for testing the behaviour of a Websockets connection.
@@ -25,7 +26,10 @@ import java.util.concurrent.CountDownLatch;
 public class MockWebsocketApi extends WebsocketApi {
 
   private boolean canConnect = true;
-  private Map<Request, FlowthingsFuture> answers = new HashMap<>();
+  private ConcurrentHashMap<Request, Callable> answers = new ConcurrentHashMap<>();
+  private ConcurrentHashMap<Request, AtomicInteger> counters = new ConcurrentHashMap<>();
+
+  private ExecutorService pool = Executors.newCachedThreadPool();
 
   public MockWebsocketApi(boolean canConnect) throws FlowthingsException {
     super(new Credentials("a","b"));
@@ -41,12 +45,19 @@ public class MockWebsocketApi extends WebsocketApi {
     }
   }
 
-  public void setAnswer(Request request, Object response){
-    answers.put(request, FlowthingsFuture.fromResult(response));
+  public MockWebsocketApi setAnswer(Request request, Callable response){
+    answers.put(request, response);
+    return this;
   }
-  public void setException(Request request, FlowthingsException response){
-    answers.put(request, FlowthingsFuture.fromException(response));
+  public MockWebsocketApi setException(Request request, FlowthingsException response){
+    answers.put(request, () -> {throw response;});
+    return this;
   }
+  public MockWebsocketApi setAnswerImmediately(Request request, Object response){
+    answers.put(request, () -> response);
+    return this;
+  }
+
   public void supplyIncomingDrop(String flowId, Drop drop){
     WebsocketsDropResponse r1 = new WebsocketsDropResponse();
     r1.setResource(flowId);
@@ -59,7 +70,7 @@ public class MockWebsocketApi extends WebsocketApi {
   protected <S> FlowthingsFuture<S> sendRequest(Request<S> request) {
     Request.Action action = request.action;
     Types type = request.type;
-    FlowthingsFuture answer = answers.get(request);
+    final Callable provider = answers.get(request);
 
     // Copied from the main implementation
     if (request.action == Request.Action.SUBSCRIBE) {
@@ -69,12 +80,26 @@ public class MockWebsocketApi extends WebsocketApi {
       subscriptions.remove(request.flowId);
     }
 
-    if (answer != null){
-      return answer;
+    // Increment counter
+    counters.compute(request, (k, v) -> {
+      if (v == null){
+        return new AtomicInteger(0);
+      }
+      v.incrementAndGet();
+      return v;
+    });
+
+    if (provider != null){
+      Future<S> future = pool.submit(provider);
+      return new FlowthingsFuture<>(future);
     }
 
     // Block forever
     return new FlowthingsFuture<>(SettableFuture.<S>create());
+  }
+
+  public int getCounter(Request request){
+    return counters.getOrDefault(request, new AtomicInteger(0)).get();
   }
 
   @Override
@@ -90,6 +115,7 @@ public class MockWebsocketApi extends WebsocketApi {
   protected String connectHttp() throws FlowthingsException {
     return "beepboop";
   }
+
 
   public class MockSocket implements WebsocketApi.Socket {
 
