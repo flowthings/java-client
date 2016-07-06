@@ -2,13 +2,16 @@ package com.flowthings.client;
 
 import com.flowthings.client.api.Flowthings;
 import com.flowthings.client.api.MockWebsocketApi;
+import com.flowthings.client.api.SubscriptionCallback;
 import com.flowthings.client.domain.Device;
+import com.flowthings.client.domain.Drop;
 import com.flowthings.client.exception.ConnectionRefusedException;
 import com.flowthings.client.exception.FlowthingsException;
 import com.flowthings.client.exception.NotFoundException;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -97,4 +100,27 @@ public class MockWebsocketApiTest {
       // Pass
     }
   }
+
+  @Test
+  public void testDropSubscribe() throws Exception {
+    final MockWebsocketApi api = new MockWebsocketApi(true);
+    api.start();
+
+    final CountDownLatch l = new CountDownLatch(1);
+    api.sendAsync(Flowthings.drop("f5758799c9e5273467374d820").subscribe(
+        new SubscriptionCallback<Drop>() {
+          @Override
+          public void onMessage(Drop drop) {
+            l.countDown();
+          }
+        }
+    ));
+
+    Drop d1 = new Drop.Builder().addElem("foo", "bar").get();
+    api.supplyIncomingDrop("f5758799c9e5273467374d820", d1);
+
+
+    l.await(200, TimeUnit.MILLISECONDS);
+  }
 }
+

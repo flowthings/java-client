@@ -1,6 +1,7 @@
 package com.flowthings.client.api;
 
 import com.flowthings.client.Credentials;
+import com.flowthings.client.domain.Drop;
 import com.flowthings.client.domain.Types;
 import com.flowthings.client.exception.ConnectionRefusedException;
 import com.flowthings.client.exception.FlowthingsException;
@@ -46,12 +47,27 @@ public class MockWebsocketApi extends WebsocketApi {
   public void setException(Request request, FlowthingsException response){
     answers.put(request, FlowthingsFuture.fromException(response));
   }
+  public void supplyIncomingDrop(String flowId, Drop drop){
+    WebsocketsDropResponse r1 = new WebsocketsDropResponse();
+    r1.setResource(flowId);
+    r1.setType("drop");
+    r1.setValue(drop);
+    this.onWebsocketsDropResponse(r1);
+  }
 
   @Override
   protected <S> FlowthingsFuture<S> sendRequest(Request<S> request) {
     Request.Action action = request.action;
     Types type = request.type;
     FlowthingsFuture answer = answers.get(request);
+
+    // Copied from the main implementation
+    if (request.action == Request.Action.SUBSCRIBE) {
+      SubscriptionCallback<Drop> callback = (SubscriptionCallback<Drop>) request.otherData.get("callback");
+      subscriptions.put(request.flowId, callback);
+    } else if (request.action == Request.Action.UNSUBSCRIBE) {
+      subscriptions.remove(request.flowId);
+    }
 
     if (answer != null){
       return answer;
