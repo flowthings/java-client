@@ -2,20 +2,15 @@ package com.flowthings.client;
 
 import com.flowthings.client.api.Flowthings;
 import com.flowthings.client.api.MockWebsocketApi;
-import com.flowthings.client.api.Request;
 import com.flowthings.client.domain.Device;
-import com.flowthings.client.domain.Types;
 import com.flowthings.client.exception.ConnectionRefusedException;
 import com.flowthings.client.exception.FlowthingsException;
 import com.flowthings.client.exception.NotFoundException;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -33,7 +28,7 @@ public class MockWebsocketApiTest {
      */
     final MockWebsocketApi api = new MockWebsocketApi(true);
     api.retryDelayMs = 500;
-    api.setAnswer(Types.DEVICE, Request.Action.GET, d);
+    api.setAnswer(Flowthings.device().get("v5758799c9e5273467374d820"), d);
     api.start();
 
     // Device returns
@@ -49,7 +44,7 @@ public class MockWebsocketApiTest {
     }
 
     // An example of not-found
-    api.setException(Types.FLOW, Request.Action.GET, new NotFoundException("boop"));
+    api.setException(Flowthings.flow().get("f5758799c9e5273467374d820"), new NotFoundException("boop"));
 
     try {
       api.sendAsync(Flowthings.flow().get("f5758799c9e5273467374d820")).grab();

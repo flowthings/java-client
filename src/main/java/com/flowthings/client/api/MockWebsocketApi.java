@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 public class MockWebsocketApi extends WebsocketApi {
 
   private boolean canConnect = true;
-  private Map<RequestPair, FlowthingsFuture> answers = new HashMap<>();
+  private Map<Request, FlowthingsFuture> answers = new HashMap<>();
 
   public MockWebsocketApi(boolean canConnect) throws FlowthingsException {
     super(new Credentials("a","b"));
@@ -40,18 +40,18 @@ public class MockWebsocketApi extends WebsocketApi {
     }
   }
 
-  public void setAnswer(Types domainObjectType, Request.Action action, Object response){
-    answers.put(new RequestPair(domainObjectType, action), FlowthingsFuture.fromResult(response));
+  public void setAnswer(Request request, Object response){
+    answers.put(request, FlowthingsFuture.fromResult(response));
   }
-  public void setException(Types domainObjectType, Request.Action action, FlowthingsException response){
-    answers.put(new RequestPair(domainObjectType, action), FlowthingsFuture.fromException(response));
+  public void setException(Request request, FlowthingsException response){
+    answers.put(request, FlowthingsFuture.fromException(response));
   }
 
   @Override
   protected <S> FlowthingsFuture<S> sendRequest(Request<S> request) {
     Request.Action action = request.action;
     Types type = request.type;
-    FlowthingsFuture answer = answers.get(new RequestPair(type, action));
+    FlowthingsFuture answer = answers.get(request);
 
     if (answer != null){
       return answer;
@@ -94,31 +94,3 @@ public class MockWebsocketApi extends WebsocketApi {
   }
 }
 
-class RequestPair {
-  private final Types type;
-  private final Request.Action action;
-
-  public RequestPair(Types type, Request.Action action) {
-    this.type = type;
-    this.action = action;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    RequestPair that = (RequestPair) o;
-
-    if (type != that.type) return false;
-    return action == that.action;
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = type.hashCode();
-    result = 31 * result + action.hashCode();
-    return result;
-  }
-}

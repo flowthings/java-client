@@ -106,4 +106,29 @@ public class QueryOptions {
     return results;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    QueryOptions that = (QueryOptions) o;
+
+    if (sorts != null ? !sorts.equals(that.sorts) : that.sorts != null)
+      return false;
+    if (skip != null ? !skip.equals(that.skip) : that.skip != null)
+      return false;
+    if (limit != null ? !limit.equals(that.limit) : that.limit != null)
+      return false;
+    return !(filter != null ? !filter.equals(that.filter) : that.filter != null);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = sorts != null ? sorts.hashCode() : 0;
+    result = 31 * result + (skip != null ? skip.hashCode() : 0);
+    result = 31 * result + (limit != null ? limit.hashCode() : 0);
+    result = 31 * result + (filter != null ? filter.hashCode() : 0);
+    return result;
+  }
 }
