@@ -38,10 +38,10 @@ public class WebsocketApi extends Api {
   private static Map<Request.Action, String> methods = new HashMap<>();
   private String host;
   private boolean secure;
-  private SimpleSocket socket;
+  protected Socket socket;
   private RestApi restApi;
   private Random random;
-  private int retryDelay = 5;
+  public int retryDelayMs = 5000;
   private CountDownLatch reconnectLatch = new CountDownLatch(1);
   boolean reconnect = true;
   ConcurrentHashMap<String, WSCallback> callbacks = new ConcurrentHashMap<>();
@@ -59,7 +59,7 @@ public class WebsocketApi extends Api {
     methods.put(Request.Action.UNSUBSCRIBE, "unsubscribe");
   }
 
-  public WebsocketApi(final Credentials credentials, final String host, boolean secure) throws FlowthingsException {
+  public WebsocketApi(final Credentials credentials, final String host, boolean secure) {
     this.host = host;
     this.secure = secure;
     final String transport = secure ? "https://" : "http://";
@@ -76,8 +76,12 @@ public class WebsocketApi extends Api {
         return transport + host + "/session";
       }
     };
-    this.socket = connect();
     this.random = new Random();
+
+  }
+
+  public void start() throws FlowthingsException {
+    this.socket = establish();
 
     new Thread(new Runnable() {
       @Override
@@ -98,14 +102,14 @@ public class WebsocketApi extends Api {
 
           while (reconnect) {
             try {
-              socket = connect();
+              socket = establish();
               resubscribeAll();
               break;
             } catch (FlowthingsException e) {
-              System.out.println("WS Connection failed. Retry in " + retryDelay + "s");
+              System.out.println("WS Connection failed. Retry in " + retryDelayMs + "ms");
 
               try {
-                Thread.sleep(retryDelay * 1000);
+                Thread.sleep(retryDelayMs);
               } catch (InterruptedException e1) {
               }
             }
@@ -133,9 +137,9 @@ public class WebsocketApi extends Api {
     socket.close();
   }
 
-  protected SimpleSocket connect() throws FlowthingsException {
+  protected Socket establish() throws FlowthingsException {
     String sessionId = connectHttp();
-    SimpleSocket socket = connectWs(sessionId);
+    Socket socket = connectWs(sessionId);
     reconnectLatch.countDown();
     return socket;
   }
@@ -146,7 +150,7 @@ public class WebsocketApi extends Api {
     return response.getId();
   }
 
-  protected SimpleSocket connectWs(String sessionId) throws FlowthingsException {
+  protected Socket connectWs(String sessionId) throws FlowthingsException {
     String transport = secure ? "wss://" : "ws://";
     String url = transport + host + "/session/" + sessionId + "/ws";
     SslContextFactory ssl = new SslContextFactory();
@@ -172,6 +176,10 @@ public class WebsocketApi extends Api {
     } catch (InterruptedException e) {
       // Not sure
     }
+    return sendRequest(request);
+  }
+
+  protected <S> FlowthingsFuture<S> sendRequest(Request<S> request) {
     WebsocketRequest<S> wsr = new WebsocketRequest<>();
     wsr.setType(methods.get(request.action));
     wsr.setMsgId("" + random.nextInt());
@@ -216,12 +224,48 @@ public class WebsocketApi extends Api {
     }
   }
 
+  protected void onWebsocketsDropResponse(WebsocketsDropResponse r1){
+    if (r1.getResource() != null) {
+      SubscriptionCallback<Drop> callback = subscriptions.get(r1.getResource());
+      if (callback != null) {
+        callback.onMessage(r1.getValue());
+        return;
+      }
+    }
+    System.out.println("Received message but didn't know what to do with it: " + r1.toString());
+  }
+
+  protected void onWebsocketsApiResponse(String msgId, Response response){
+    WSCallback wsCallback = callbacks.get(msgId);
+    callbacks.remove(msgId);
+    if (wsCallback != null) {
+      SettableFuture future = wsCallback.future;
+      int status = response.getHead().getStatus();
+      if (response.getHead().isOk()) {
+        future.set(response.getBody());
+      } else if (status == 404) {
+        future.setException(new NotFoundException(response.getHead().getErrors().get(0)));
+      } else if (status == 403) {
+        future.setException(new AuthorizationException(response.getHead().getErrors().get(0)));
+      } else {
+        future.setException(new BadRequestException(response.getHead().getErrors().get(0)));
+      }
+      callbacks.remove(msgId);
+    }
+  }
+
   private void resubscribe(String flowId, SubscriptionCallback<Drop> dropSubscriptionCallback) throws FlowthingsException {
     send(Flowthings.drop(flowId).subscribe(dropSubscriptionCallback));
   }
 
+  public interface Socket {
+    void close();
+    void send(String message) throws FlowthingsException;
+    void join() throws InterruptedException;
+  }
+
   @WebSocket(maxTextMessageSize = 1024 * 1024)
-  public class SimpleSocket {
+  public class SimpleSocket implements Socket {
     protected static final String heartbeat = "{\"type\" : \"heartbeat\"}";
     private final CountDownLatch closeLatch;
     @SuppressWarnings("unused")
@@ -289,14 +333,7 @@ public class WebsocketApi extends Api {
           try {
             WebsocketsDropResponse r1 = Serializer.fromJson(msg, new TypeToken<WebsocketsDropResponse>() {
             });
-            if (r1.getResource() != null) {
-              SubscriptionCallback<Drop> callback = subscriptions.get(r1.getResource());
-              if (callback != null) {
-                callback.onMessage(r1.getValue());
-                return;
-              }
-            }
-            System.out.println("Received message but didn't know what to do with it: " + msg);
+            onWebsocketsDropResponse(r1);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
@@ -305,21 +342,9 @@ public class WebsocketApi extends Api {
         String msgId = r.getHead().getMsgId();
         if (msgId != null) {
           WSCallback wsCallback = callbacks.get(msgId);
-          callbacks.remove(msgId);
           if (wsCallback != null) {
-            SettableFuture future = wsCallback.future;
             Object response = Serializer.fromJson(msg, wsCallback.type.token);
-            int status = ((Response) response).getHead().getStatus();
-            if (((Response) response).getHead().isOk()) {
-              future.set(((Response) response).getBody());
-            } else if (status == 404) {
-              future.setException(new NotFoundException(((Response) response).getHead().getErrors().get(0)));
-            } else if (status == 403) {
-              future.setException(new AuthorizationException(((Response) response).getHead().getErrors().get(0)));
-            } else {
-              future.setException(new BadRequestException(((Response) response).getHead().getErrors().get(0)));
-            }
-            callbacks.remove(msgId);
+            onWebsocketsApiResponse(msgId, (Response) response);
           }
         }
       } catch (Exception e) {
@@ -327,6 +352,8 @@ public class WebsocketApi extends Api {
       }
     }
   }
+
+
 
   private static class WSCallback {
     public SettableFuture future;

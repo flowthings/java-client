@@ -2,6 +2,8 @@ package com.flowthings.client.api;
 
 import com.flowthings.client.exception.AsyncException;
 import com.flowthings.client.exception.FlowthingsException;
+import com.flowthings.client.response.Response;
+import com.google.common.util.concurrent.Futures;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -17,6 +19,13 @@ public class FlowthingsFuture<T> implements Future<T> {
 
   protected FlowthingsFuture(Future<T> inner){
     this.inner = inner;
+  }
+
+  protected static <S> FlowthingsFuture<S> fromResult(S result){
+    return new FlowthingsFuture<>(Futures.immediateFuture(result));
+  }
+  protected static <S> FlowthingsFuture<S> fromException(FlowthingsException e){
+    return new FlowthingsFuture<>(Futures.<S>immediateFailedFuture(e));
   }
 
   @Override
