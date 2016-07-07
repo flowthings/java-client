@@ -1,11 +1,15 @@
 package com.flowthings.client.api;
 
+import java.util.Map;
+
 public class WebsocketRequest<T> {
   public String msgId;
   public String object;
   public String type;
   public String flowId;
+  public String id;
   public T value;
+  private Map<String, String> options;
 
   public String getMsgId() {
     return msgId;
@@ -47,4 +51,19 @@ public class WebsocketRequest<T> {
     this.value = value;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setOptions(Map<String, String> options) {
+    this.options = options;
+  }
+
+  public Map<String, String> getOptions() {
+    return options;
+  }
 }

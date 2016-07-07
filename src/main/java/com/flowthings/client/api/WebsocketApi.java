@@ -194,6 +194,8 @@ public class WebsocketApi extends Api {
     wsr.setObject(request.type.name);
     wsr.setFlowId(request.flowId);
     wsr.setValue(request.bodyObject);
+    wsr.setId(request.id);
+    wsr.setOptions(request.queryOptions.toMap());
     String value = Serializer.toJson(wsr);
     if (request.action == Action.SUBSCRIBE) {
       SubscriptionCallback<Drop> callback = (SubscriptionCallback<Drop>) request.otherData.get("callback");
@@ -257,8 +259,12 @@ public class WebsocketApi extends Api {
       if (response.getHead().isOk()) {
 
         // Workaround - WS will sometimes send null rather than empty-list
-        if (response.getBody() == null && wsCallback.type.isListType()){
-          future.set(new ArrayList());
+        if (response.getBody() == null){
+          if (wsCallback.type.isListType()){
+            future.set(new ArrayList());
+          } else {
+            future.setException(new NotFoundException("Not found"));
+          }
         } else {
           future.set(response.getBody());
         }
