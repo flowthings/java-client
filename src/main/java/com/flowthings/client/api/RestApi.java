@@ -156,4 +156,9 @@ public class RestApi extends Api {
     }
     return b.toString();
   }
+
+  @Override
+  public void close() {
+    // Nothing to do
+  }
 }

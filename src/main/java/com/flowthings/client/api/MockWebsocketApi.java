@@ -49,6 +49,21 @@ public class MockWebsocketApi extends WebsocketApi {
     answers.put(request, response);
     return this;
   }
+  public MockWebsocketApi setAnswers(Request request, Object... responses){
+    final AtomicInteger counter = new AtomicInteger();
+    answers.put(request, () -> {
+      int i = counter.getAndIncrement();
+      i = Math.min(responses.length - 1, i);
+
+      Object response = responses[i];
+      if (response instanceof FlowthingsException){
+        throw (FlowthingsException) response;
+      }
+
+      return response;
+    });
+    return this;
+  }
   public MockWebsocketApi setException(Request request, FlowthingsException response){
     answers.put(request, () -> {throw response;});
     return this;

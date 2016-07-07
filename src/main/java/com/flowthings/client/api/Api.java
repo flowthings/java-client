@@ -44,4 +44,6 @@ public abstract class Api {
 
   public abstract boolean supportsSubscribe();
 
+  public abstract void close();
+
 }
