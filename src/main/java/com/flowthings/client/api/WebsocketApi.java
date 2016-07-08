@@ -203,16 +203,21 @@ public class WebsocketApi extends Api {
     } else if (request.action == Action.UNSUBSCRIBE) {
       subscriptions.remove(request.flowId);
     }
-    // Send
-    try {
-      socket.send(value);
-    } catch (FlowthingsException e) {
-      return new FlowthingsFuture<S>(Futures.<S>immediateFailedFuture(e));
-    }
     // Register a callback
     SettableFuture<S> future = SettableFuture.create();
     WSCallback callback = new WSCallback(future, request.type);
     callbacks.put(wsr.getMsgId(), callback);
+
+    // Send
+    try {
+      socket.send(value);
+    } catch (FlowthingsException e) {
+      // Unregister the callback
+      if (callbacks.containsKey(wsr.getMsgId())){
+        callbacks.remove(wsr.getMsgId());
+      }
+      return new FlowthingsFuture<S>(Futures.<S>immediateFailedFuture(e));
+    }
     return new FlowthingsFuture<>(future);
   }
 
@@ -371,6 +376,8 @@ public class WebsocketApi extends Api {
           if (wsCallback != null) {
             Object response = Serializer.fromJson(msg, wsCallback.type.token);
             onWebsocketsApiResponse(msgId, (Response) response);
+          } else {
+            System.out.println("Don't know what to do with message: " + msgId);
           }
         }
       } catch (Exception e) {
