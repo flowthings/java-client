@@ -13,14 +13,14 @@ import java.util.regex.Pattern;
  */
 public class DropFromPathApi {
 
-//  private static final Pattern FLOW_ID_PATTERN = Pattern.compile("f[0-9a-f]{24}");
+  private static final Pattern PATTERN = Pattern.compile("(/[a-z0-9-_:]+)+/?");
 
   private String path;
 
   DropFromPathApi(String path) {
-//    if (!FLOW_ID_PATTERN.matcher(flowId).matches()) {
-//      throw new IllegalArgumentException(String.format("\"%s\" is not a valid flow id", flowId));
-//    }
+    if (!PATTERN.matcher(path).matches()) {
+      throw new IllegalArgumentException(String.format("\"%s\" is not a valid path", path));
+    }
     this.path = path;
   }
 
