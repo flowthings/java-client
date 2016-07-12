@@ -95,7 +95,13 @@ public class WebsocketApi extends Api {
             e.printStackTrace();
           }
           System.out.printf("Lost WS Connection\n");
-          socket.close();
+
+          try {
+            socket.close();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+
           reconnectLatch = new CountDownLatch(1);
 
           // Kill any futures which will now never get a result
@@ -106,7 +112,7 @@ public class WebsocketApi extends Api {
               socket = establish();
               resubscribeAll();
               break;
-            } catch (FlowthingsException e) {
+            } catch (Exception e) {
               System.out.println("WS Connection failed. Retry in " + retryDelayMs + "ms");
 
               try {

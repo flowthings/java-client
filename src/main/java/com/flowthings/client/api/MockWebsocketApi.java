@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -96,13 +97,14 @@ public class MockWebsocketApi extends WebsocketApi {
     }
 
     // Increment counter
-    counters.compute(request, (k, v) -> {
-      if (v == null){
-        return new AtomicInteger(0);
-      }
-      v.incrementAndGet();
-      return v;
-    });
+    final AtomicInteger v = new AtomicInteger(0);
+    AtomicInteger i = counters.putIfAbsent(request, v);
+    if (i == null){
+      i = v;
+    }
+    i.incrementAndGet();
+
+    System.out.println(action.toString() + "|" + type.toString());
 
     if (provider != null){
       Future<S> future = pool.submit(provider);
