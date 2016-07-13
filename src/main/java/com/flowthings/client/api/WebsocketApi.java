@@ -8,10 +8,7 @@ package com.flowthings.client.api;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.*;
 
 import com.flowthings.client.exception.*;
@@ -33,9 +30,12 @@ import com.flowthings.client.domain.Types;
 import com.flowthings.client.response.Response;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
 public class WebsocketApi extends Api {
+  protected static Logger logger = LoggerFactory.getLogger(WebsocketApi.class);
   private static Map<Request.Action, String> methods = new HashMap<>();
   private String host;
   private boolean secure;
@@ -58,6 +58,13 @@ public class WebsocketApi extends Api {
     methods.put(Request.Action.GET, "find");
     methods.put(Request.Action.SUBSCRIBE, "subscribe");
     methods.put(Request.Action.UNSUBSCRIBE, "unsubscribe");
+    configureJettyLogging();
+  }
+
+  private static void configureJettyLogging() {
+    Properties p = new Properties();
+    p.setProperty("org.eclipse.jetty.LEVEL", "WARN");
+    org.eclipse.jetty.util.log.StdErrLog.setProperties(p);
   }
 
   public WebsocketApi(final Credentials credentials, final String host, boolean secure) {
@@ -94,7 +101,7 @@ public class WebsocketApi extends Api {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          System.out.printf("Lost WS Connection\n");
+          logger.info("Lost WS Connection\n");
 
           try {
             socket.close();
@@ -113,7 +120,7 @@ public class WebsocketApi extends Api {
               resubscribeAll();
               break;
             } catch (Exception e) {
-              System.out.println("WS Connection failed. Retry in " + retryDelayMs + "ms");
+              logger.info("WS Connection failed. Retry in " + retryDelayMs + "ms");
 
               try {
                 Thread.sleep(retryDelayMs);
@@ -175,9 +182,9 @@ public class WebsocketApi extends Api {
       ClientUpgradeRequest request = new ClientUpgradeRequest();
       socket = new SimpleSocket();
       Future<Session> connect = client.connect(socket, serverUrl, request);
-      System.out.printf("Connecting to : %s\n", serverUrl);
+      logger.info("Connecting to : %s\n", serverUrl);
       connect.get();
-      System.out.printf("Connected\n");
+      logger.info("Connected\n");
       return socket;
     } catch (Throwable t) {
       throw new FlowthingsException(t);
@@ -217,6 +224,7 @@ public class WebsocketApi extends Api {
     // Send
     try {
       socket.send(value);
+      logger.debug("sent msg: {}", value);
     } catch (FlowthingsException e) {
       // Unregister the callback
       if (callbacks.containsKey(wsr.getMsgId())){
@@ -242,9 +250,9 @@ public class WebsocketApi extends Api {
       SubscriptionCallback<Drop> dropSubscriptionCallback = subscriptions.get(flowId);
       try {
         resubscribe(flowId, dropSubscriptionCallback);
-        System.out.println("Resubscribed to " + flowId);
+        logger.info("Resubscribed to " + flowId);
       } catch (FlowthingsException e) {
-        System.out.println("Could not resubscribe to flow: " + flowId);
+        logger.info("Could not resubscribe to flow: " + flowId);
         e.printStackTrace();
       }
     }
@@ -258,7 +266,7 @@ public class WebsocketApi extends Api {
         return;
       }
     }
-    System.out.println("Received message but didn't know what to do with it: " + r1.toString());
+    logger.info("Received message but didn't know what to do with it: " + r1.toString());
   }
 
   protected void onWebsocketsApiResponse(String msgId, Response response){
@@ -359,6 +367,7 @@ public class WebsocketApi extends Api {
 
     @OnWebSocketMessage
     public void onMessage(String msg) {
+      logger.debug("received msg: {}", msg);
       // Deserialize
       // TODO - greatly improve this
       WebsocketsResponse r = null;
@@ -383,7 +392,7 @@ public class WebsocketApi extends Api {
             Object response = Serializer.fromJson(msg, wsCallback.type.token);
             onWebsocketsApiResponse(msgId, (Response) response);
           } else {
-            System.out.println("Don't know what to do with message: " + msgId);
+            logger.info("Don't know what to do with message: " + msgId);
           }
         }
       } catch (Exception e) {

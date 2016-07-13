@@ -3,6 +3,8 @@ package com.flowthings.client;
 import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Holds credentials necessary to authenticate with flowthings.io any of our
@@ -39,6 +41,7 @@ import com.google.gson.reflect.TypeToken;
  * @author matt
  */
 public class Credentials {
+  protected static Logger logger = LoggerFactory.getLogger(Credentials.class);
   public String account;
   public String token;
 
@@ -69,7 +72,7 @@ public class Credentials {
    */
   public static Credentials fromBluemixOrDefault(Credentials defaultCredentials) {
     String VCAP_SERVICES = System.getenv("VCAP_SERVICES");
-    System.out.println(VCAP_SERVICES);
+    logger.info(VCAP_SERVICES);
     if (VCAP_SERVICES != null) {
       try {
         VcapServices services = Serializer.fromJson(VCAP_SERVICES, new TypeToken<VcapServices>() {
@@ -78,15 +81,15 @@ public class Credentials {
           return services.flowthings.get(0).credentials;
         }
       } catch (Exception e) {
-        System.out.println("Couldn't deserialize bluemix VCAP_SERVICES");
+        logger.info("Couldn't deserialize bluemix VCAP_SERVICES");
       }
     }
-    System.out.println("Using default credentials : " + defaultCredentials);
+    logger.info("Using default credentials : " + defaultCredentials);
     return defaultCredentials;
   }
 
   public static void main(String[] args) {
-    System.out.println("Got creds: " + Credentials.fromBluemixOrDefault(null));
+    logger.info("Got creds: " + Credentials.fromBluemixOrDefault(null));
   }
 }
 

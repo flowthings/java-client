@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import com.flowthings.client.response.ListResponse;
 import com.flowthings.client.response.ObjectResponse;
 import com.google.gson.reflect.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum Types {
   API_IMPORTER_TASK(ApiImporterTask.class, "api-task", false, new TypeToken<ObjectResponse<ApiImporterTask>>() {
@@ -38,6 +40,8 @@ public enum Types {
   }), TRACKS(Track.class, "track", true, new TypeToken<ListResponse<Track>>() {
   }), LOCAL_TRACKS(LocalTrack.class, "local-track", true, new TypeToken<ListResponse<LocalTrack>>() {
   });
+
+  protected static Logger logger = LoggerFactory.getLogger(Types.class);
   public final Class<? extends FlowDomainObject> klazz;
   public final Type tokenType;
   public final String name;
@@ -60,7 +64,7 @@ public enum Types {
         }
       } catch (Exception e) {
         e.printStackTrace();
-        System.out.println("ERROR ON " + t);
+        logger.info("ERROR ON " + t);
       }
     }
   }
