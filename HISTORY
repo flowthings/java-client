@@ -1,3 +1,13 @@
+v0.9.2.7 - 07/18/2016
+==============
+- Fix some exception handling issues.
+- Remove creds from the unit tests (these no longer work)
+- Fail fast if the user has not called .start() on a WS api
+
+v0.9.2.6 - 07/14/2016
+==============
+- Use a logging framework
+
 v0.9.2.5 - 07/13/2016
 ==============
 - Fixes for WebSockets auto-reconnect

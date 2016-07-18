@@ -3,6 +3,7 @@ package com.flowthings.client;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import com.flowthings.client.api.WebsocketApi;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -20,10 +21,27 @@ import com.flowthings.client.exception.NotFoundException;
 
 @SuppressWarnings("unused")
 public class RestApiTests {
-  private static String accountName = "matt";
-  private static String tokenString = "fWNhEOEJ2RdqoKiqOfLfYlDyNrCWCTBU";
-  private static Credentials credentials = new Credentials(accountName, tokenString);
-  private static RestApi api = new RestApi(credentials);
+  private static String accountName;
+  private static String tokenString;
+  private static Credentials credentials;
+  private static RestApi api;
+  static {
+    accountName = System.getenv("FTIO_CLIENT_TEST_USER");
+    tokenString = System.getenv("FTIO_CLIENT_TEST_TOKEN");
+    credentials = new Credentials(accountName, tokenString);
+
+    if (accountName == null || accountName.isEmpty() ||
+        tokenString == null || tokenString.isEmpty()){
+      throw new IllegalStateException("To run tests, ensure FTIO_CLIENT_TEST_USER and FTIO_CLIENT_TEST_TOKEN are " +
+          "supplied (a valid username and master token, respectively)");
+    }
+
+    api = new RestApi(credentials);
+  }
+
+  static {
+
+  }
 
   @Test
   public void testFlows() throws FlowthingsException {

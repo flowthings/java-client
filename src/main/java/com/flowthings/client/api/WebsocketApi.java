@@ -39,6 +39,7 @@ public class WebsocketApi extends Api {
   private static Map<Request.Action, String> methods = new HashMap<>();
   private String host;
   private boolean secure;
+  private boolean started;
   protected Socket socket;
   private RestApi restApi;
   private Random random;
@@ -132,6 +133,7 @@ public class WebsocketApi extends Api {
       }
 
     }).start();
+    this.started = true;
     return this;
   }
 
@@ -192,6 +194,10 @@ public class WebsocketApi extends Api {
   }
 
   public <S> FlowthingsFuture<S> send(Request<S> request) {
+    if (!this.started){
+      throw new IllegalStateException("Api not started yet. Must call .start() method");
+    }
+
     try {
       reconnectLatch.await();
     } catch (InterruptedException e) {

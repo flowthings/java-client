@@ -99,7 +99,11 @@ public class RestApi extends Api {
       } catch (java.net.ConnectException e) {
         throw new ConnectionRefusedException(String.format("Error connecting to %s: %s", url, e.getMessage()));
       } catch (Exception e) {
-        stringResponse = collectResponse(connection.getErrorStream());
+        try {
+          stringResponse = collectResponse(connection.getErrorStream());
+        } catch (Exception e2) {
+          throw new FlowthingsException(e);
+        }
 
         // Messy
         if (request.listResponse){

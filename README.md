@@ -59,7 +59,8 @@ Track alertTrack = new Track.Builder()
 api.send(track().create(alertTrack));
 
 // Subscribe to Websockets to get instant pushes of alerts
-WebsocketApi wsApi = new WebsocketApi(credentials);
+// Note the api has a .start() method which must be called
+WebsocketApi wsApi = new WebsocketApi(credentials).start();
 wsApi.send(drop(outputFlow.getId()).subscribe(
     new SubscriptionCallback<Drop>() {
       public void onMessage(Drop t) {

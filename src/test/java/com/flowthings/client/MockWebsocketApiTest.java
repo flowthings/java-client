@@ -61,6 +61,8 @@ public class MockWebsocketApiTest {
      */
     api.setCanConnect(false);
 
+    Thread.sleep(200);
+
     // Now requests should block
     final AtomicReference<Device> i = new AtomicReference<>();
     new Thread(new Runnable(){
