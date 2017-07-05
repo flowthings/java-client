@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.commons.codec.binary.Base64;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -242,19 +241,6 @@ public abstract class DropElementSerializer<T> {
     @Override
     public JsonElement toPrimitive(Date d) {
       return new JsonPrimitive(d.getTime());
-    }
-  };
-  protected static DropElementSerializer<byte[]> BYTES = new DropElementSerializer<byte[]>("bytes") {
-    protected Base64 base64 = new Base64();
-
-    @Override
-    public byte[] from(String type, JsonElement e) {
-      return base64.decode(e.getAsString());
-    }
-
-    @Override
-    public JsonElement toPrimitive(byte[] b) {
-      return new JsonPrimitive(base64.encodeAsString(b));
     }
   };
   protected static DropElementSerializer<Location> LOCATION = new DropElementSerializer<Location>("location") {
