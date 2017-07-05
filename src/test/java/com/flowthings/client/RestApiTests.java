@@ -22,13 +22,15 @@ import com.flowthings.client.exception.NotFoundException;
 @SuppressWarnings("unused")
 public class RestApiTests {
   private static String accountName;
-  private static String tokenString;
-  private static Credentials credentials;
   private static RestApi api;
+  private static String hostString;
+  private static boolean secure;
   static {
     accountName = System.getenv("FTIO_CLIENT_TEST_USER");
-    tokenString = System.getenv("FTIO_CLIENT_TEST_TOKEN");
-    credentials = new Credentials(accountName, tokenString);
+    String tokenString = System.getenv("FTIO_CLIENT_TEST_TOKEN");
+    hostString = System.getenv("FTIO_CLIENT_TEST_HOST");
+    String secureString = System.getenv("FTIO_CLIENT_TEST_SECURE");
+    Credentials credentials = new Credentials(accountName, tokenString);
 
     if (accountName == null || accountName.isEmpty() ||
         tokenString == null || tokenString.isEmpty()){
@@ -36,12 +38,16 @@ public class RestApiTests {
           "supplied (a valid username and master token, respectively)");
     }
 
-    api = new RestApi(credentials);
+    if (hostString != null){
+      secure = secureString != null && secureString.toLowerCase().equals("true");
+      api = new RestApi(credentials, hostString, secure);
+    } else {
+      api = new RestApi(credentials);
+    }
   }
 
-  static {
 
-  }
+
 
   @Test
   public void testFlows() throws FlowthingsException {
@@ -93,6 +99,7 @@ public class RestApiTests {
       drop2 = api.send(Flowthings.dropFromPath(path).create(drop2));
       Assert.assertNotNull("Created", drop);
       Assert.assertNotNull("Created", drop2);
+      sleep(1000);
       // Get
       Drop got = api.send(Flowthings.drop(flowId).get(drop.getId()));
       Assert.assertEquals("Got", drop, got);
@@ -104,7 +111,7 @@ public class RestApiTests {
       // Update
       drop.getElems().put("baz", 7);
       Drop updated = api.send(Flowthings.drop(flowId).update(drop.getId(), drop));
-      Assert.assertEquals("Updated", 7, updated.getElems().get("baz"));
+      Assert.assertEquals("Updated", 7l, updated.getElems().get("baz"));
       // Delete
       api.send(Flowthings.drop(flowId).delete(drop.getId()));
       api.send(Flowthings.drop(flowId).delete(drop2.getId()));
@@ -121,6 +128,14 @@ public class RestApiTests {
     } finally {
       // (delete test flow)
       api.send(Flowthings.flow().delete(flowId));
+    }
+  }
+
+  private void sleep(long i) {
+    try {
+      Thread.sleep(i);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
 
@@ -167,7 +182,10 @@ public class RestApiTests {
 
   @Test
   public void test403() throws FlowthingsException {
-    RestApi api = new RestApi(new Credentials("nope", "nooo"));
+    RestApi api = hostString == null ?
+        new RestApi(new Credentials("nope", "nooo")) :
+        new RestApi(new Credentials("nope", "nooo"), hostString, secure);
+
     List<Flow> r1 = null;
     try {
       r1 = api.send(Flowthings.flow().find());
@@ -178,7 +196,9 @@ public class RestApiTests {
 
   @Test
   public void test403Async() throws FlowthingsException {
-    RestApi api = new RestApi(new Credentials("nope", "nooo"));
+    RestApi api = hostString == null ?
+        new RestApi(new Credentials("nope", "nooo")) :
+        new RestApi(new Credentials("nope", "nooo"), hostString, secure);
     List<Flow> r1 = null;
     try {
       r1 = api.sendAsync(Flowthings.flow().find()).grab();
@@ -269,7 +289,7 @@ public class RestApiTests {
       }));
       Assert.fail("Should have thrown exception");
     } catch (Exception e) {
-      e.printStackTrace();
+      // All good!
     }
   }
 }

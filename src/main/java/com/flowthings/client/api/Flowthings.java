@@ -32,6 +32,7 @@ public class Flowthings {
   private static MutableDomainObjectApi<Track> track = new MutableDomainObjectApi<>(Track.class);
   private static MutableDomainObjectApi<LocalTrack> localTrack = new MutableDomainObjectApi<>(LocalTrack.class);
 
+  @Deprecated
   public static MutableDomainObjectApi<ApiImporterTask> apiImporter() {
     return apiImporter;
   }
@@ -52,6 +53,7 @@ public class Flowthings {
     return mqttConnection;
   }
 
+  @Deprecated
   public static MutableDomainObjectApi<RssTask> rssTask() {
     return rssTask;
   }

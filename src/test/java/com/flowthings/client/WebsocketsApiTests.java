@@ -29,12 +29,17 @@ public class WebsocketsApiTests {
   private static String tokenString;
   private static Credentials credentials;
   private static WebsocketApi api;
+  private static String host;
+  private static String secure;
+
+  private static boolean sec;
+
   static {
     try {
       accountName = System.getenv("FTIO_CLIENT_TEST_USER");
       tokenString = System.getenv("FTIO_CLIENT_TEST_TOKEN");
-      String host = System.getenv("FTIO_CLIENT_TEST_HOST");
-      String secure = System.getenv("FTIO_CLIENT_TEST_SECURE");
+      host = System.getenv("FTIO_CLIENT_TEST_HOST");
+      secure = System.getenv("FTIO_CLIENT_TEST_SECURE");
 
       credentials = new Credentials(accountName, tokenString);
 
@@ -45,7 +50,7 @@ public class WebsocketsApiTests {
       }
 
       if (host != null && !host.isEmpty() && secure != null && !secure.isEmpty()){
-        boolean sec = Boolean.parseBoolean(secure);
+        sec = Boolean.parseBoolean(secure);
         api = new WebsocketApi(credentials, host, sec).start();
       } else {
         api = new WebsocketApi(credentials).start();
@@ -101,7 +106,8 @@ public class WebsocketsApiTests {
   public void test403() throws FlowthingsException, ExecutionException, InterruptedException {
     List<Flow> r1 = null;
     try {
-      WebsocketApi api = new WebsocketApi(new Credentials("nope", "nooo")).start();
+      WebsocketApi api = host == null ? new WebsocketApi(new Credentials("nope", "nooo")).start() :
+          new WebsocketApi(new Credentials("nope", "nooo"), host, sec).start();
       api.send(Flowthings.flow().find()).get();
       Assert.fail("Should have thrown exception");
     } catch (AuthorizationException e) {
@@ -117,6 +123,17 @@ public class WebsocketsApiTests {
       System.out.println("R2 is: " + r2);
       Assert.fail("Should have thrown exception");
     } catch (NotFoundException e) {
+    }
+  }
+
+  @Test
+  public void testNewDrop() throws FlowthingsException, InterruptedException, ExecutionException {
+
+    try {
+      Drop r2 = api.send(Flowthings.dropFromPath("/bob").create(new Drop.Builder().addElem("a", "b").get())).grab();
+      System.out.println("R2 is: " + r2);
+    } catch (BadRequestException e) {
+      e.printStackTrace();
     }
   }
 

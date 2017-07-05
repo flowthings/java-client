@@ -112,6 +112,7 @@ public class MockWebsocketApi extends WebsocketApi {
     }
 
     // Block forever
+    System.out.println("ERROR: No behaviour associated with request!");
     return new FlowthingsFuture<>(SettableFuture.<S>create());
   }
 

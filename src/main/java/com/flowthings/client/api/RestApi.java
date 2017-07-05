@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import com.flowthings.client.Credentials;
 import com.flowthings.client.Header;
@@ -25,8 +24,6 @@ import com.flowthings.client.exception.NotFoundException;
 import com.flowthings.client.response.ListResponse;
 import com.flowthings.client.response.ObjectResponse;
 import com.flowthings.client.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Send requests over HTTP. Responses are synchronous.
@@ -34,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * @author matt
  */
 public class RestApi extends Api {
-  protected static Logger logger = LoggerFactory.getLogger(RestApi.class);
   private final ExecutorService pool;
   private Credentials credentials;
   private String url;
@@ -79,13 +75,11 @@ public class RestApi extends Api {
           out.flush();
         }
       }
-      logger.debug("sent msg: {}", request.body);
       // Todo - big cleanup here
       String stringResponse = null;
       try {
         stringResponse = collectResponse(connection.getInputStream());
         Response<S> response = Serializer.fromJson(stringResponse, request.typeToken);
-        logger.debug("received msg: {}", response.getBody());
         int status = response.getHead().getStatus();
         if (response.getHead().isOk()) {
           return response.getBody();

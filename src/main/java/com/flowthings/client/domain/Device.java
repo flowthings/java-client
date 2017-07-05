@@ -80,7 +80,8 @@ public class Device extends FlowDomainObject {
 
   @Override
   public String toString() {
-    return "Device [displayName=" + displayName + ", path=" + path + ", status=" + status + ", toString()="
+    return "Device [displayName=" + displayName + ", path=" + path + ", status=" + status
+        + ", tracks=[" + getTracks().keySet() + "], toString()="
         + super.toString() + "]";
   }
 

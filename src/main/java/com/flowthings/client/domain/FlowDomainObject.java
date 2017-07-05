@@ -88,7 +88,11 @@ public abstract class FlowDomainObject implements Serializable {
 
   @Override
   public String toString() {
-    return "FlowDomainObject [id=" + id + "]";
+    return "FlowDomainObject{" +
+        "id='" + id + '\'' +
+        ", creationDate=" + creationDate +
+        ", lastEditDate=" + lastEditDate +
+        '}';
   }
 
   @SuppressWarnings("unchecked")

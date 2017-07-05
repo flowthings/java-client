@@ -30,12 +30,9 @@ import com.flowthings.client.domain.Types;
 import com.flowthings.client.response.Response;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.reflect.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
 public class WebsocketApi extends Api {
-  protected static Logger logger = LoggerFactory.getLogger(WebsocketApi.class);
   private static Map<Request.Action, String> methods = new HashMap<>();
   private String host;
   private boolean secure;
@@ -102,7 +99,8 @@ public class WebsocketApi extends Api {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          logger.info("Lost WS Connection\n");
+//          logger.info("Lost WS Connection\n");
+          System.out.println("Lost WS Connection");
 
           try {
             socket.close();
@@ -184,7 +182,7 @@ public class WebsocketApi extends Api {
       ClientUpgradeRequest request = new ClientUpgradeRequest();
       socket = new SimpleSocket();
       Future<Session> connect = client.connect(socket, serverUrl, request);
-      logger.info("Connecting to : %s\n", serverUrl);
+      System.out.println("Connecting to : "+ serverUrl);
       connect.get();
       logger.info("Connected\n");
       return socket;
@@ -230,7 +228,6 @@ public class WebsocketApi extends Api {
     // Send
     try {
       socket.send(value);
-      logger.debug("sent msg: {}", value);
     } catch (FlowthingsException e) {
       // Unregister the callback
       if (callbacks.containsKey(wsr.getMsgId())){
@@ -373,7 +370,6 @@ public class WebsocketApi extends Api {
 
     @OnWebSocketMessage
     public void onMessage(String msg) {
-      logger.debug("received msg: {}", msg);
       // Deserialize
       // TODO - greatly improve this
       WebsocketsResponse r = null;

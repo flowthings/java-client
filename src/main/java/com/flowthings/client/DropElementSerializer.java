@@ -1,32 +1,16 @@
 package com.flowthings.client;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.apache.commons.codec.binary.Base64;
-
-import com.flowthings.client.domain.elements.Duration;
-import com.flowthings.client.domain.elements.Length;
 import com.flowthings.client.domain.elements.Location;
-import com.flowthings.client.domain.elements.MapLike;
-import com.flowthings.client.domain.elements.Media;
-import com.flowthings.client.domain.elements.Text;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.codec.binary.Base64;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public abstract class DropElementSerializer<T> {
   protected String[] typeKeys;
@@ -46,10 +30,7 @@ public abstract class DropElementSerializer<T> {
   }
 
   public JsonElement to(T o) {
-    JsonObject jo = new JsonObject();
-    jo.add("type", new JsonPrimitive(getTypeKey(o)));
-    jo.add("value", toPrimitive(o));
-    return jo;
+    return toPrimitive(o);
   }
 
   public abstract JsonElement toPrimitive(T o);
@@ -66,19 +47,21 @@ public abstract class DropElementSerializer<T> {
       if (p.isBoolean()) {
         return p.getAsBoolean();
       } else if (p.isNumber()) {
-        return p.getAsNumber();
+        Number number = p.getAsNumber();
+        if (number.doubleValue() % 1 == 0){
+          return number.longValue();
+        } else {
+          return number.doubleValue();
+        }
       } else {
         return p.getAsString();
       }
     }
+    if (e instanceof JsonArray){
+      return DropElementSerializer.COLLECTION.from("list", e);
+    }
     if (e instanceof JsonObject) {
-      JsonObject o = (JsonObject) e;
-      String type = o.get("type").getAsString();
-      DropElementSerializer s = serializerMap.get(type);
-      if (s == null) {
-        throw new UnsupportedOperationException("Type " + type + " not supported");
-      }
-      return s.from(type, o.get("value"));
+      return DropElementSerializer.MAP.from("map", e);
     }
     return e;
   }
@@ -106,7 +89,7 @@ public abstract class DropElementSerializer<T> {
   }
 
   protected static int extractIntMember(JsonObject o, String key) {
-    return o.has(key) ? o.getAsJsonObject(key).getAsJsonPrimitive("value").getAsInt() : 0;
+    return o.has(key) ? o.getAsJsonPrimitive(key).getAsInt() : 0;
   }
 
   // --------------------------------------
@@ -149,81 +132,6 @@ public abstract class DropElementSerializer<T> {
         o.add(e.getKey(), toJsonElement(e.getValue()));
       }
       return o;
-    }
-  };
-  protected static DropElementSerializer<MapLike> MAPLIKE = new DropElementSerializer<MapLike>("text", "media") {
-    @Override
-    protected String getTypeKey(MapLike e) {
-      return e.getType();
-    }
-
-    @Override
-    public MapLike from(String type, JsonElement elem) {
-      MapLike m = "media".equals(type) ? new Media() : new Text();
-      JsonObject c = elem.getAsJsonObject();
-      for (Map.Entry<String, JsonElement> e : c.entrySet()) {
-        m.put(e.getKey(), DropElementSerializer.fromJsonElement(e.getValue()));
-      }
-      return m;
-    }
-
-    @Override
-    public JsonElement toPrimitive(MapLike o) {
-      JsonObject jo = new JsonObject();
-      for (String s : o) {
-        jo.add(s, toJsonElement(o.get(s)));
-      }
-      return jo;
-    }
-  };
-  protected static DropElementSerializer<Length> LENGTH = new DropElementSerializer<Length>("length") {
-    @Override
-    protected String getTypeKey(Length e) {
-      return "length";
-    }
-
-    @Override
-    public Length from(String type, JsonElement elem) {
-      JsonObject c = elem.getAsJsonObject();
-      JsonElement unitsJ = c.get("unit");
-      JsonElement magnitudeJ = c.get("magnitude");
-      String units = unitsJ == null ? "METERS" : unitsJ.getAsString();
-      Double magnitude = magnitudeJ == null ? 0.0 : magnitudeJ.getAsDouble();
-      Length l = new Length(Length.Units.valueOf(units.toUpperCase()), magnitude);
-      return l;
-    }
-
-    @Override
-    public JsonElement toPrimitive(Length o) {
-      JsonObject jo = new JsonObject();
-      jo.addProperty("unit", o.getUnits().name().toLowerCase());
-      jo.addProperty("magnitude", o.getMagnitude());
-      return jo;
-    }
-  };
-  protected static DropElementSerializer<Duration> DURATION = new DropElementSerializer<Duration>("duration") {
-    @Override
-    protected String getTypeKey(Duration e) {
-      return "duration";
-    }
-
-    @Override
-    public Duration from(String type, JsonElement elem) {
-      JsonObject c = elem.getAsJsonObject();
-      JsonElement unitsJ = c.get("unit");
-      JsonElement magnitudeJ = c.get("magnitude");
-      String units = unitsJ == null ? "MILLISECONDS" : unitsJ.getAsString();
-      Double magnitude = magnitudeJ == null ? 0.0 : magnitudeJ.getAsDouble();
-      Duration l = new Duration(Duration.Units.valueOf(units.toUpperCase()), magnitude);
-      return l;
-    }
-
-    @Override
-    public JsonElement toPrimitive(Duration o) {
-      JsonObject jo = new JsonObject();
-      jo.addProperty("unit", o.getUnits().name().toLowerCase());
-      jo.addProperty("magnitude", o.getMagnitude());
-      return jo;
     }
   };
   //
@@ -398,10 +306,5 @@ public abstract class DropElementSerializer<T> {
         }
       }
     }
-    serializerMap.put(byte[].class, BYTES);
-    serializerMap.put(Text.class, MAPLIKE);
-    serializerMap.put(Media.class, MAPLIKE);
-    serializerMap.put(Duration.class, DURATION);
-    serializerMap.put(Length.class, LENGTH);
   }
 }

@@ -1,6 +1,9 @@
 package com.flowthings.client;
 
 import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +37,7 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
 
   @Test
   public void testDrop() {
+    dropCheck(Serializer.fromJson(readFromFile("/json/Drop-Full.json"), Drop.class), false);
     testSerialize("/json/Drop-Full.json", Drop.class);
     testSerialize("/json/Drop-Minimal.json", Drop.class);
   }
@@ -112,22 +116,36 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
       }
     }
   }
-  // @Test
-  // public void testFindBucketByKeywordDeserialization() {
-  // String json = readFromFile("/json/FindBucketByKeywordResponse.json");
-  // if (json == "") {
-  // // just skip if we can't find the file. Configure the files in maven
-  // // later.
-  // Assert.assertTrue(true);
-  // return;
-  // }
-  // Response<List<Flow>> fsr = Serializer.fromJson(json, new
-  // TypeToken<Response<List<Flow>>>() {
-  // });
-  // List<? extends FlowDomainObject> l = fsr.get();
-  // Assert.assertEquals(l.size(), 10);
-  // for (FlowDomainObject d : l) {
-  // Assert.assertNotNull(d);
-  // }
-  // }
+
+  /**
+   * It's not good enough just to serialize then deserialize, and check the results.
+   * We need to do a field-by-field check
+   */
+
+  private void dropCheck(Drop fromString, boolean minimal){
+    Assert.assertEquals("d0000000000018cc6666f6f00", fromString.getId());
+    Assert.assertEquals("f55523257adc66a5ff36e731c", fromString.getFlowId());
+    Assert.assertEquals("/alice/apples", fromString.getPath());
+    if (!minimal) {
+      Assert.assertEquals("f55523257adc66a5ff36e731c", fromString.getParentDropId().getFlowId());
+      Assert.assertEquals("d55523257adc66a5ff36e731c", fromString.getParentDropId().getDropId());
+      Assert.assertEquals(new Date(1433800947425l), fromString.getLastEditDate());
+      Assert.assertEquals(0.06031791922725516, fromString.getLocation().getLatitude(), 0.000001);
+      Assert.assertEquals(0.6709274265862697, fromString.getLocation().getLongitude(), 0.000001);
+      Assert.assertEquals("foo", fromString.getFhash());
+    }
+    Assert.assertEquals("beepboop", fromString.getElems().get("astring"));
+    Assert.assertEquals(true, fromString.getElems().get("abool"));
+    // TODO - fix
+    Assert.assertEquals(1433800947425l, fromString.getElems().get("along"));
+    Assert.assertEquals(5.87, fromString.getElems().get("adouble"));
+    Assert.assertEquals("bar", ((Map<String,Object>)fromString.getElems().get("anobject")).get("foo"));
+    Assert.assertEquals(7.3, ((Map<String,Object>)fromString.getElems().get("anobject")).get("baz"));
+    // TODO - fix
+    Assert.assertEquals(1l, ((List<Object>)fromString.getElems().get("anarray")).get(0));
+    Assert.assertEquals(2l, ((List<Object>)fromString.getElems().get("anarray")).get(1));
+    Assert.assertEquals(3.4, ((List<Object>)fromString.getElems().get("anarray")).get(2));
+    Assert.assertEquals(true, ((List<Object>)fromString.getElems().get("anarray")).get(3));
+    Assert.assertEquals(false, ((List<Object>)fromString.getElems().get("anarray")).get(4));
+  }
 }

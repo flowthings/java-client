@@ -1,30 +1,21 @@
 package com.flowthings.client;
 
+import com.flowthings.client.domain.*;
+import com.flowthings.client.domain.elements.Location;
+import com.flowthings.client.response.ListResponse;
+import com.flowthings.client.response.MapResponse;
+import com.flowthings.client.response.ObjectResponse;
+import com.flowthings.client.response.Response;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
 import java.lang.reflect.Type;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.flowthings.client.domain.*;
-import com.flowthings.client.response.ListResponse;
-import com.flowthings.client.response.MapResponse;
-import com.flowthings.client.response.ObjectResponse;
-import com.flowthings.client.response.Response;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
 
 public class Serializer {
 
@@ -71,129 +62,105 @@ public class Serializer {
   @SuppressWarnings("rawtypes")
   private static Gson createGsonSerializer() {
     GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-    builder.registerTypeAdapter(ListResponse.ERROR.class, new JsonDeserializer<ListResponse.ERROR>() {
-      @SuppressWarnings("rawtypes")
-      @Override
-      public ListResponse.ERROR deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        ListResponse.ERROR r = new ListResponse.ERROR();
-        JsonObject jo = (JsonObject) json;
-        JsonElement head = jo.remove("head");
-        r.setHead((Response.Head) context.deserialize(head, Response.Head.class));
-        return r;
-      }
+    builder.registerTypeAdapter(ListResponse.ERROR.class, (JsonDeserializer<ListResponse.ERROR>) (json, typeOfT, context) -> {
+      ListResponse.ERROR r = new ListResponse.ERROR();
+      JsonObject jo = (JsonObject) json;
+      JsonElement head = jo.remove("head");
+      r.setHead((Response.Head) context.deserialize(head, Response.Head.class));
+      return r;
     });
-    builder.registerTypeAdapter(ObjectResponse.ERROR.class, new JsonDeserializer<ObjectResponse.ERROR>() {
-      @SuppressWarnings("rawtypes")
-      @Override
-      public ObjectResponse.ERROR deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        ObjectResponse.ERROR r = new ObjectResponse.ERROR();
-        JsonObject jo = (JsonObject) json;
-        JsonElement head = jo.remove("head");
-        r.setHead((Response.Head) context.deserialize(head, Response.Head.class));
-        return r;
-      }
+    builder.registerTypeAdapter(ObjectResponse.ERROR.class, (JsonDeserializer<ObjectResponse.ERROR>) (json, typeOfT, context) -> {
+      ObjectResponse.ERROR r = new ObjectResponse.ERROR();
+      JsonObject jo = (JsonObject) json;
+      JsonElement head = jo.remove("head");
+      r.setHead((Response.Head) context.deserialize(head, Response.Head.class));
+      return r;
     });
     /* Type adapter for key-value put response. */
-    builder.registerTypeAdapter(ParseToken.class, new JsonDeserializer<ParseToken>() {
-      @Override
-      public ParseToken deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        ParseToken r = new ParseToken();
-        JsonObject jo = (JsonObject) json;
-        JsonElement head = jo.remove("head");
-        r.head = context.deserialize(head, MapResponse.Head.class);
-        JsonElement je = jo.get("body");
-        if (je instanceof JsonObject) {
-          JsonObject body = (JsonObject) je;
-          Iterator<Map.Entry<String, JsonElement>> iter = body.entrySet().iterator();
-          if (iter.hasNext()) {
-            Map.Entry<String, JsonElement> first = iter.next();
-            r.value = (first.getValue().toString());
-          }
-        }
-        return r;
-      }
-    });
-    builder.registerTypeAdapter(Date.class, new JsonSerializer<Date>() {
-      @Override
-      public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(src.getTime());
-      }
-    });
-    builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
-      @Override
-      public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        Date d = new Date();
-        d.setTime(json.getAsLong());
-        return d;
-      }
-    });
-    builder.registerTypeAdapter(Permissions.class, new JsonDeserializer<Permissions>() {
-      @Override
-      public Permissions deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        try {
-          JsonObject map = (JsonObject) json;
-          JsonElement readObj = map.get("read");
-          JsonElement writeObj = map.get("write");
-          JsonElement dropReadObj = map.get("dropRead");
-          JsonElement dropWriteObj = map.get("dropWrite");
-
-          boolean read = readObj == null ? false : readObj.getAsBoolean();
-          boolean write = writeObj == null ? false : writeObj.getAsBoolean();
-          boolean dropRead = dropReadObj == null ? false : dropReadObj.getAsBoolean();
-          boolean dropWrite = dropWriteObj == null ? false : dropWriteObj.getAsBoolean();
-
-          return new Permissions(read, write, dropRead, dropWrite);
-        } catch (Exception e) {
-          logger.log(Level.FINE, "Couldn't deserialize " + json + " as permissions");
-          return null;
+    builder.registerTypeAdapter(ParseToken.class, (JsonDeserializer<ParseToken>) (json, typeOfT, context) -> {
+      ParseToken r = new ParseToken();
+      JsonObject jo = (JsonObject) json;
+      JsonElement head = jo.remove("head");
+      r.head = context.deserialize(head, MapResponse.Head.class);
+      JsonElement je = jo.get("body");
+      if (je instanceof JsonObject) {
+        JsonObject body = (JsonObject) je;
+        Iterator<Entry<String, JsonElement>> iter = body.entrySet().iterator();
+        if (iter.hasNext()) {
+          Entry<String, JsonElement> first = iter.next();
+          r.value = (first.getValue().toString());
         }
       }
+      return r;
     });
-    builder.registerTypeAdapter(TokenPermissions.class, new JsonDeserializer<TokenPermissions>() {
-      @Override
-      public TokenPermissions deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        try {
-          JsonObject map = (JsonObject) json;
-          JsonElement dropReadObj = map.get("dropRead");
-          JsonElement dropWriteObj = map.get("dropWrite");
-
-          boolean dropRead = dropReadObj == null ? false : dropReadObj.getAsBoolean();
-          boolean dropWrite = dropWriteObj == null ? false : dropWriteObj.getAsBoolean();
-
-          return new TokenPermissions(dropRead, dropWrite);
-        } catch (Exception e) {
-          logger.log(Level.FINE, "Couldn't deserialize " + json + " as token permissions");
-          return null;
-        }
-      }
+    builder.registerTypeAdapter(Date.class, (JsonSerializer<Date>) (src, typeOfSrc, context) -> new JsonPrimitive(src.getTime()));
+    builder.registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> {
+      Date d = new Date();
+      d.setTime(json.getAsLong());
+      return d;
     });
-    builder.registerTypeAdapter(DropElementsMap.class, new JsonSerializer<DropElementsMap>() {
-      @Override
-      public JsonElement serialize(DropElementsMap src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject o = new JsonObject();
-        for (Map.Entry<String, Object> entry : src.entrySet()) {
-          o.add(entry.getKey(), DropElementSerializer.toJsonElement(entry.getValue()));
-        }
-        return o;
-      }
+    builder.registerTypeAdapter(Location.class, (JsonSerializer<Location>) (src, typeOfSrc, context) -> {
+      JsonObject locObj = new JsonObject();
+      locObj.add("lat", new JsonPrimitive(src.getLatitude()));
+      locObj.add("lon", new JsonPrimitive(src.getLongitude()));
+      return locObj;
     });
-    builder.registerTypeAdapter(DropElementsMap.class, new JsonDeserializer<DropElementsMap>() {
-      @Override
-      public DropElementsMap deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-          throws JsonParseException {
-        DropElementsMap d = new DropElementsMap();
+    builder.registerTypeAdapter(Location.class, (JsonDeserializer<Location>) (json, typeOfT, context) -> {
+      JsonObject map = (JsonObject) json;
+      JsonElement lat = map.get("lat");
+      JsonElement lon = map.get("lon");
+      double latD = lat == null ? 0.0 : lat.getAsDouble();
+      double lonD = lon == null ? 0.0 : lon.getAsDouble();
+      return new Location(latD, lonD);
+    });
+    builder.registerTypeAdapter(Permissions.class, (JsonDeserializer<Permissions>) (json, typeOfT, context) -> {
+      try {
         JsonObject map = (JsonObject) json;
-        for (Entry<String, JsonElement> e : map.entrySet()) {
-          d.put(e.getKey(), DropElementSerializer.fromJsonElement(e.getValue()));
-        }
-        return d;
+        JsonElement readObj = map.get("read");
+        JsonElement writeObj = map.get("write");
+        JsonElement dropReadObj = map.get("dropRead");
+        JsonElement dropWriteObj = map.get("dropWrite");
+
+        boolean read = readObj != null && readObj.getAsBoolean();
+        boolean write = writeObj != null && writeObj.getAsBoolean();
+        boolean dropRead = dropReadObj != null && dropReadObj.getAsBoolean();
+        boolean dropWrite = dropWriteObj != null && dropWriteObj.getAsBoolean();
+
+        return new Permissions(read, write, dropRead, dropWrite);
+      } catch (Exception e) {
+        logger.log(Level.FINE, "Couldn't deserialize " + json + " as permissions");
+        return null;
       }
+    });
+    builder.registerTypeAdapter(TokenPermissions.class, (JsonDeserializer<TokenPermissions>) (json, typeOfT, context) -> {
+      try {
+        JsonObject map = (JsonObject) json;
+        JsonElement dropReadObj = map.get("dropRead");
+        JsonElement dropWriteObj = map.get("dropWrite");
+
+        boolean dropRead = dropReadObj != null && dropReadObj.getAsBoolean();
+        boolean dropWrite = dropWriteObj != null && dropWriteObj.getAsBoolean();
+
+        return new TokenPermissions(dropRead, dropWrite);
+      } catch (Exception e) {
+        logger.log(Level.FINE, "Couldn't deserialize " + json + " as token permissions");
+        return null;
+      }
+    });
+    builder.registerTypeAdapter(DropElementsMap.class, (JsonSerializer<DropElementsMap>) (src, typeOfSrc, context) -> {
+      JsonObject o = new JsonObject();
+      for (Entry<String, Object> entry : src.entrySet()) {
+        o.add(entry.getKey(), DropElementSerializer.toJsonElement(entry.getValue()));
+      }
+      return o;
+    });
+    builder.registerTypeAdapter(DropElementsMap.class, (JsonDeserializer<DropElementsMap>) (json, typeOfT, context) -> {
+      DropElementsMap d = new DropElementsMap();
+      JsonObject map = (JsonObject) json;
+      for (Entry<String, JsonElement> e : map.entrySet()) {
+        d.put(e.getKey(), DropElementSerializer.fromJsonElement(e.getValue()));
+      }
+      return d;
     });
     return builder.create();
   }
