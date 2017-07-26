@@ -1,14 +1,13 @@
 package com.flowthings.client.api;
 
-import com.flowthings.client.exception.AsyncException;
-import com.flowthings.client.exception.FlowthingsException;
-import com.flowthings.client.response.Response;
-import com.google.common.util.concurrent.Futures;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import com.flowthings.client.exception.AsyncException;
+import com.flowthings.client.exception.FlowthingsException;
+import com.google.common.util.concurrent.Futures;
 
 /**
  * Created by matt on 7/5/16.

@@ -1,10 +1,8 @@
 package com.flowthings.client.api;
 
-import com.flowthings.client.QueryOptions;
-import com.flowthings.client.domain.Drop;
-
-import java.util.List;
 import java.util.regex.Pattern;
+
+import com.flowthings.client.domain.Drop;
 
 /**
  * See {@link DomainObjectApi}

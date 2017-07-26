@@ -1,18 +1,19 @@
 package com.flowthings.client.api;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.flowthings.client.Credentials;
 import com.flowthings.client.domain.Drop;
 import com.flowthings.client.domain.Types;
 import com.flowthings.client.exception.ConnectionRefusedException;
 import com.flowthings.client.exception.FlowthingsException;
-import com.flowthings.client.response.Response;
 import com.google.common.util.concurrent.SettableFuture;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A utility class for testing the behaviour of a Websockets connection.

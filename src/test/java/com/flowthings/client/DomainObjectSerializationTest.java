@@ -118,11 +118,11 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
   }
 
   /**
-   * It's not good enough just to serialize then deserialize, and check the results.
-   * We need to do a field-by-field check
+   * It's not good enough just to serialize then deserialize, and check the
+   * results. We need to do a field-by-field check
    */
-
-  private void dropCheck(Drop fromString, boolean minimal){
+  @SuppressWarnings("unchecked")
+  private void dropCheck(Drop fromString, boolean minimal) {
     Assert.assertEquals("d0000000000018cc6666f6f00", fromString.getId());
     Assert.assertEquals("f55523257adc66a5ff36e731c", fromString.getFlowId());
     Assert.assertEquals("/alice/apples", fromString.getPath());
@@ -139,13 +139,13 @@ public class DomainObjectSerializationTest extends FileBasedSerializationTest {
     // TODO - fix
     Assert.assertEquals(1433800947425l, fromString.getElems().get("along"));
     Assert.assertEquals(5.87, fromString.getElems().get("adouble"));
-    Assert.assertEquals("bar", ((Map<String,Object>)fromString.getElems().get("anobject")).get("foo"));
-    Assert.assertEquals(7.3, ((Map<String,Object>)fromString.getElems().get("anobject")).get("baz"));
+    Assert.assertEquals("bar", ((Map<String, Object>) fromString.getElems().get("anobject")).get("foo"));
+    Assert.assertEquals(7.3, ((Map<String, Object>) fromString.getElems().get("anobject")).get("baz"));
     // TODO - fix
-    Assert.assertEquals(1l, ((List<Object>)fromString.getElems().get("anarray")).get(0));
-    Assert.assertEquals(2l, ((List<Object>)fromString.getElems().get("anarray")).get(1));
-    Assert.assertEquals(3.4, ((List<Object>)fromString.getElems().get("anarray")).get(2));
-    Assert.assertEquals(true, ((List<Object>)fromString.getElems().get("anarray")).get(3));
-    Assert.assertEquals(false, ((List<Object>)fromString.getElems().get("anarray")).get(4));
+    Assert.assertEquals(1l, ((List<Object>) fromString.getElems().get("anarray")).get(0));
+    Assert.assertEquals(2l, ((List<Object>) fromString.getElems().get("anarray")).get(1));
+    Assert.assertEquals(3.4, ((List<Object>) fromString.getElems().get("anarray")).get(2));
+    Assert.assertEquals(true, ((List<Object>) fromString.getElems().get("anarray")).get(3));
+    Assert.assertEquals(false, ((List<Object>) fromString.getElems().get("anarray")).get(4));
   }
 }

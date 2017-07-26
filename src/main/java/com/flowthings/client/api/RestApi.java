@@ -54,7 +54,6 @@ public class RestApi extends Api {
     this.pool = Executors.newCachedThreadPool();
   }
 
-  @SuppressWarnings("unchecked")
   public <S> S send(Request<S> request) throws FlowthingsException {
     try {
       String queryString = toQueryString(request.buildHttpPath(credentials, url), request.queryOptions.toMap());

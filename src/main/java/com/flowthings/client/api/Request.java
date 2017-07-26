@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import com.flowthings.client.Credentials;
 import com.flowthings.client.QueryOptions;
 import com.flowthings.client.Serializer;
-import com.flowthings.client.domain.Device;
 import com.flowthings.client.domain.Types;
 import com.flowthings.client.response.Response;
 import com.google.gson.reflect.TypeToken;

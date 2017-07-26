@@ -1,21 +1,30 @@
 package com.flowthings.client;
 
-import com.flowthings.client.domain.*;
+import java.lang.reflect.Type;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.flowthings.client.domain.DropElementsMap;
+import com.flowthings.client.domain.FlowDomainObject;
+import com.flowthings.client.domain.Permissions;
+import com.flowthings.client.domain.TokenPermissions;
+import com.flowthings.client.domain.Types;
 import com.flowthings.client.domain.elements.Location;
 import com.flowthings.client.response.ListResponse;
 import com.flowthings.client.response.MapResponse;
 import com.flowthings.client.response.ObjectResponse;
 import com.flowthings.client.response.Response;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Serializer {
 

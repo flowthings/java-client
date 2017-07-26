@@ -9,8 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.flowthings.client.exception.AuthorizationException;
 import com.flowthings.client.exception.NotFoundException;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.apache.commons.codec.binary.StringUtils;
 import org.junit.Test;
 
 import com.flowthings.client.api.Flowthings;
@@ -31,31 +29,24 @@ public class WebsocketsApiTests {
   private static WebsocketApi api;
   private static String host;
   private static String secure;
-
   private static boolean sec;
-
   static {
     try {
       accountName = System.getenv("FTIO_CLIENT_TEST_USER");
       tokenString = System.getenv("FTIO_CLIENT_TEST_TOKEN");
       host = System.getenv("FTIO_CLIENT_TEST_HOST");
       secure = System.getenv("FTIO_CLIENT_TEST_SECURE");
-
       credentials = new Credentials(accountName, tokenString);
-
-      if (accountName == null || accountName.isEmpty() ||
-          tokenString == null || tokenString.isEmpty()){
-        throw new IllegalStateException("To run tests, ensure FTIO_CLIENT_TEST_USER and FTIO_CLIENT_TEST_TOKEN are " +
-            "supplied (a valid username and master token, respectively)");
+      if (accountName == null || accountName.isEmpty() || tokenString == null || tokenString.isEmpty()) {
+        throw new IllegalStateException("To run tests, ensure FTIO_CLIENT_TEST_USER and FTIO_CLIENT_TEST_TOKEN are "
+            + "supplied (a valid username and master token, respectively)");
       }
-
-      if (host != null && !host.isEmpty() && secure != null && !secure.isEmpty()){
+      if (host != null && !host.isEmpty() && secure != null && !secure.isEmpty()) {
         sec = Boolean.parseBoolean(secure);
         api = new WebsocketApi(credentials, host, sec).start();
       } else {
         api = new WebsocketApi(credentials).start();
       }
-
     } catch (FlowthingsException e) {
       e.printStackTrace();
     }
@@ -106,8 +97,8 @@ public class WebsocketsApiTests {
   public void test403() throws FlowthingsException, ExecutionException, InterruptedException {
     List<Flow> r1 = null;
     try {
-      WebsocketApi api = host == null ? new WebsocketApi(new Credentials("nope", "nooo")).start() :
-          new WebsocketApi(new Credentials("nope", "nooo"), host, sec).start();
+      WebsocketApi api = host == null ? new WebsocketApi(new Credentials("nope", "nooo")).start()
+          : new WebsocketApi(new Credentials("nope", "nooo"), host, sec).start();
       api.send(Flowthings.flow().find()).get();
       Assert.fail("Should have thrown exception");
     } catch (AuthorizationException e) {
@@ -128,7 +119,6 @@ public class WebsocketsApiTests {
 
   @Test
   public void testNewDrop() throws FlowthingsException, InterruptedException, ExecutionException {
-
     try {
       Drop r2 = api.send(Flowthings.dropFromPath("/bob").create(new Drop.Builder().addElem("a", "b").get())).grab();
       System.out.println("R2 is: " + r2);
