@@ -23,6 +23,7 @@ public enum Types {
   }), TOKEN(Token.class, "token", false, new TypeToken<ObjectResponse<Token>>() {
   }), TRACK(Track.class, "track", false, new TypeToken<ObjectResponse<Track>>() {
   }), LOCAL_TRACK(LocalTrack.class, "local-track", false, new TypeToken<ObjectResponse<LocalTrack>>() {
+  }), AV_CONNECTION(AvConnection.class, "av-connection", false, new TypeToken<ObjectResponse<AvConnection>>() {
   }),
   //
   API_IMPORTER_TASKS(ApiImporterTask.class, "api-task", true, new TypeToken<ListResponse<ApiImporterTask>>() {
@@ -37,8 +38,8 @@ public enum Types {
   }), TOKENS(Token.class, "token", true, new TypeToken<ListResponse<Token>>() {
   }), TRACKS(Track.class, "track", true, new TypeToken<ListResponse<Track>>() {
   }), LOCAL_TRACKS(LocalTrack.class, "local-track", true, new TypeToken<ListResponse<LocalTrack>>() {
+  }), AV_CONNECTIONS(AvConnection.class, "av-connection", true, new TypeToken<ListResponse<AvConnection>>() {
   });
-
   public final Class<? extends FlowDomainObject> klazz;
   public final Type tokenType;
   public final String name;
@@ -107,7 +108,7 @@ public enum Types {
     return fromListNameMap.get(name);
   }
 
-  public boolean isListType(){
+  public boolean isListType() {
     return listType;
   }
 }

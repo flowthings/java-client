@@ -1,16 +1,13 @@
 package com.flowthings.client;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import com.flowthings.client.api.WebsocketApi;
-import junit.framework.Assert;
 
 import org.junit.Test;
 
 import com.flowthings.client.api.Flowthings;
 import com.flowthings.client.api.RestApi;
 import com.flowthings.client.api.SubscriptionCallback;
+import com.flowthings.client.domain.AvConnection;
 import com.flowthings.client.domain.Drop;
 import com.flowthings.client.domain.Flow;
 import com.flowthings.client.domain.Token;
@@ -18,6 +15,8 @@ import com.flowthings.client.domain.TokenPermissions;
 import com.flowthings.client.exception.AuthorizationException;
 import com.flowthings.client.exception.FlowthingsException;
 import com.flowthings.client.exception.NotFoundException;
+
+import junit.framework.Assert;
 
 @SuppressWarnings("unused")
 public class RestApiTests {
@@ -31,14 +30,11 @@ public class RestApiTests {
     hostString = System.getenv("FTIO_CLIENT_TEST_HOST");
     String secureString = System.getenv("FTIO_CLIENT_TEST_SECURE");
     Credentials credentials = new Credentials(accountName, tokenString);
-
-    if (accountName == null || accountName.isEmpty() ||
-        tokenString == null || tokenString.isEmpty()){
-      throw new IllegalStateException("To run tests, ensure FTIO_CLIENT_TEST_USER and FTIO_CLIENT_TEST_TOKEN are " +
-          "supplied (a valid username and master token, respectively)");
+    if (accountName == null || accountName.isEmpty() || tokenString == null || tokenString.isEmpty()) {
+      throw new IllegalStateException("To run tests, ensure FTIO_CLIENT_TEST_USER and FTIO_CLIENT_TEST_TOKEN are "
+          + "supplied (a valid username and master token, respectively)");
     }
-
-    if (hostString != null){
+    if (hostString != null) {
       secure = secureString != null && secureString.toLowerCase().equals("true");
       api = new RestApi(credentials, hostString, secure);
     } else {
@@ -46,15 +42,42 @@ public class RestApiTests {
     }
   }
 
-
-
+  @Test
+  public void testAvConnections() throws FlowthingsException {
+    String companyName = "company" + System.currentTimeMillis();
+    String path = "/" + accountName + "/test" + System.currentTimeMillis();
+    AvConnection av = new AvConnection.Builder().setCompany(companyName).setDestination(path).get();
+    // Create
+    av = api.send(Flowthings.avConnection().create(av));
+    Assert.assertNotNull("Created", av);
+    // Get
+    AvConnection got = api.send(Flowthings.avConnection().get(av.getId()));
+    Assert.assertEquals("Got", av, got);
+    // Find
+    List<AvConnection> results = api
+        .send(Flowthings.avConnection().find(new QueryOptions().filter("destination==\"" + path + "\"")));
+    Assert.assertEquals("Found", 1, results.size());
+    Assert.assertEquals("Found", av, results.get(0));
+    // Update
+    av.setDescription("Now with all new descriptions!");
+    AvConnection updated = api.send(Flowthings.avConnection().update(av.getId(), av));
+    Assert.assertEquals("Updated", "Now with all new descriptions!", updated.getDescription());
+    // Delete
+    api.send(Flowthings.avConnection().delete(av.getId()));
+    // Get again
+    try {
+      got = api.send(Flowthings.avConnection().get(av.getId()));
+      Assert.fail();
+    } catch (Exception e) {
+    }
+  }
 
   @Test
   public void testFlows() throws FlowthingsException {
     /**
      * Flows
      */
-    String path = "/" + accountName + "/test123456";
+    String path = "/" + accountName + "/testf"+System.currentTimeMillis();
     Flow flow = new Flow.Builder().setPath(path).get();
     // Create
     flow = api.send(Flowthings.flow().create(flow));
@@ -182,10 +205,8 @@ public class RestApiTests {
 
   @Test
   public void test403() throws FlowthingsException {
-    RestApi api = hostString == null ?
-        new RestApi(new Credentials("nope", "nooo")) :
-        new RestApi(new Credentials("nope", "nooo"), hostString, secure);
-
+    RestApi api = hostString == null ? new RestApi(new Credentials("nope", "nooo"))
+        : new RestApi(new Credentials("nope", "nooo"), hostString, secure);
     List<Flow> r1 = null;
     try {
       r1 = api.send(Flowthings.flow().find());
@@ -196,14 +217,14 @@ public class RestApiTests {
 
   @Test
   public void test403Async() throws FlowthingsException {
-    RestApi api = hostString == null ?
-        new RestApi(new Credentials("nope", "nooo")) :
-        new RestApi(new Credentials("nope", "nooo"), hostString, secure);
+    RestApi api = hostString == null ? new RestApi(new Credentials("nope", "nooo"))
+        : new RestApi(new Credentials("nope", "nooo"), hostString, secure);
     List<Flow> r1 = null;
     try {
       r1 = api.sendAsync(Flowthings.flow().find()).grab();
       Assert.fail("Should have thrown exception");
-    } catch (AuthorizationException e) {}
+    } catch (AuthorizationException e) {
+    }
   }
 
   @Test

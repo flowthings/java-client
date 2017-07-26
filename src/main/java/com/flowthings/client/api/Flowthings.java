@@ -1,6 +1,7 @@
 package com.flowthings.client.api;
 
 import com.flowthings.client.domain.ApiImporterTask;
+import com.flowthings.client.domain.AvConnection;
 import com.flowthings.client.domain.Device;
 import com.flowthings.client.domain.Flow;
 import com.flowthings.client.domain.Group;
@@ -20,6 +21,7 @@ import com.flowthings.client.domain.Track;
 public class Flowthings {
   private static MutableDomainObjectApi<ApiImporterTask> apiImporter = new MutableDomainObjectApi<>(
       ApiImporterTask.class);
+  private static MutableDomainObjectApi<AvConnection> avConnection = new MutableDomainObjectApi<>(AvConnection.class);
   private static MutableDomainObjectApi<Device> device = new MutableDomainObjectApi<>(Device.class);
   private static MutableDomainObjectApi<Flow> flow = new MutableDomainObjectApi<>(Flow.class);
   private static MutableDomainObjectApi<Group> group = new MutableDomainObjectApi<>(Group.class);
@@ -31,6 +33,10 @@ public class Flowthings {
   private static DomainObjectApi<Token> token = new DomainObjectApi<>(Token.class);
   private static MutableDomainObjectApi<Track> track = new MutableDomainObjectApi<>(Track.class);
   private static MutableDomainObjectApi<LocalTrack> localTrack = new MutableDomainObjectApi<>(LocalTrack.class);
+
+  public static MutableDomainObjectApi<AvConnection> avConnection() {
+    return avConnection;
+  }
 
   @Deprecated
   public static MutableDomainObjectApi<ApiImporterTask> apiImporter() {
