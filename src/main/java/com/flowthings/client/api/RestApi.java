@@ -97,9 +97,8 @@ public class RestApi extends Api {
         } catch (Exception e2) {
           throw new FlowthingsException(e);
         }
-
         // Messy
-        if (request.listResponse){
+        if (request.listResponse) {
           Response response = Serializer.fromJson(stringResponse, ListResponse.ERROR.class);
           int status = response.getHead().getStatus();
           if (status == 404) {
@@ -109,7 +108,6 @@ public class RestApi extends Api {
           } else {
             throw new BadRequestException(response.getHead().getErrors().get(0));
           }
-
         } else {
           Response response = Serializer.fromJson(stringResponse, ObjectResponse.ERROR.class);
           int status = response.getHead().getStatus();
@@ -121,7 +119,6 @@ public class RestApi extends Api {
             throw new BadRequestException(response.getHead().getErrors().get(0));
           }
         }
-
       }
     } catch (IOException e) {
       throw new FlowthingsException(e);
@@ -129,11 +126,11 @@ public class RestApi extends Api {
   }
 
   @Override
-  public <S> FlowthingsFuture<S> sendAsync(final Request<S> request){
+  public <S> FlowthingsFuture<S> sendAsync(final Request<S> request) {
     return new FlowthingsFuture<>(pool.submit(new Callable<S>() {
       @Override
       public S call() throws Exception {
-          return send(request);
+        return send(request);
       }
     }));
   }

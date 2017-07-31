@@ -10,6 +10,7 @@ import com.flowthings.client.api.SubscriptionCallback;
 import com.flowthings.client.domain.AvConnection;
 import com.flowthings.client.domain.Drop;
 import com.flowthings.client.domain.Flow;
+import com.flowthings.client.domain.Identity;
 import com.flowthings.client.domain.Token;
 import com.flowthings.client.domain.TokenPermissions;
 import com.flowthings.client.exception.AuthorizationException;
@@ -43,10 +44,21 @@ public class RestApiTests {
   }
 
   @Test
+  public void testCreateIdentity() throws FlowthingsException {
+    Credentials syscreds = new Credentials("system", "znBG0s95qWNuUcLGPXJG5fGbEmo1CWf6");
+    Credentials alicecreds = new Credentials("alice", "sFIRjS5QMcJJcZp8qWSGeE5i3967QcYx");
+    Identity i = new Identity.Builder().setName("foo2").get();
+    i.setEmail("asb@basca.com");
+    RestApi api2 = new RestApi(syscreds, "localhost:3000/v0.1", false);
+    i = api2.send(Flowthings.identity().create(i));
+    System.out.println(i);
+  }
+
+  @Test
   public void testAvConnections() throws FlowthingsException {
     String companyName = "company" + System.currentTimeMillis();
     String path = "/" + accountName + "/test" + System.currentTimeMillis();
-    AvConnection av = new AvConnection.Builder().setCompany(companyName).setDestination(path).get();
+    AvConnection av = new AvConnection.Builder().setCompanyId(companyName).setDestination(path).get();
     // Create
     av = api.send(Flowthings.avConnection().create(av));
     Assert.assertNotNull("Created", av);
@@ -77,7 +89,7 @@ public class RestApiTests {
     /**
      * Flows
      */
-    String path = "/" + accountName + "/testf"+System.currentTimeMillis();
+    String path = "/" + accountName + "/testf" + System.currentTimeMillis();
     Flow flow = new Flow.Builder().setPath(path).get();
     // Create
     flow = api.send(Flowthings.flow().create(flow));
