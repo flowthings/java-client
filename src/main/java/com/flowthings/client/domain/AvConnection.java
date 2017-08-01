@@ -1,7 +1,8 @@
 package com.flowthings.client.domain;
 
 public class AvConnection extends FlowDomainObject {
-  protected String company;
+  protected String companyId;
+  protected String companyName;
   protected String description;
   protected String destination;
   protected String displayName;
@@ -10,12 +11,20 @@ public class AvConnection extends FlowDomainObject {
   protected String status;
   protected Boolean disabled;
 
-  public String getCompany() {
-    return company;
+  public String getCompanyId() {
+    return companyId;
   }
 
-  public void setCompany(String company) {
-    this.company = company;
+  public void setCompanyId(String s) {
+    this.companyId = s;
+  }
+
+  public String getCompanyName() {
+    return companyName;
+  }
+
+  public void setCompanyName(String s) {
+    this.companyName = s;
   }
 
   public String getDescription() {
@@ -76,12 +85,12 @@ public class AvConnection extends FlowDomainObject {
 
   @Override
   public String toString() {
-    return "AvConnection [company=" + company + ", toString()=" + super.toString() + "]";
+    return "AvConnection [company=" + companyId + ", toString()=" + super.toString() + "]";
   }
 
   public static class Builder extends FlowDomainObject.Builder<AvConnection, Builder> {
-    public Builder setCompany(String s) {
-      base.setCompany(s);
+    public Builder setCompanyId(String s) {
+      base.setCompanyId(s);
       return this;
     }
 
