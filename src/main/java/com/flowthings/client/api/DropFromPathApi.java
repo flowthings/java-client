@@ -1,7 +1,9 @@
 package com.flowthings.client.api;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
+import com.flowthings.client.QueryOptions;
 import com.flowthings.client.domain.Drop;
 
 /**
@@ -25,6 +27,12 @@ public class DropFromPathApi {
   public Request<Drop> create(Drop t) {
     t.setPath(path);
     return Request.createObjectRequest(Drop.class, Request.Action.CREATE).body(t);
+  }
+
+  public Request<List<Drop>> find(QueryOptions queryOptions) {
+    queryOptions.addOtherOption("path", path);
+    return Request.createListRequest(Drop.class, Request.Action.FIND)
+        .params(queryOptions);
   }
 
 }

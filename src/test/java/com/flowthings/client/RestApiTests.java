@@ -131,6 +131,9 @@ public class RestApiTests {
       // Find
       List<Drop> results = api.send(Flowthings.drop(flowId).find(new QueryOptions().filter("elems.foo==\"bar\"")));
       Assert.assertEquals("Found", 2, results.size());
+      // Find by Path
+      results = api.send(Flowthings.dropFromPath(path).find(new QueryOptions().filter("elems.foo==\"bar\"")));
+      Assert.assertEquals("Found", 2, results.size());
       // Update
       drop.getElems().put("baz", 7);
       Drop updated = api.send(Flowthings.drop(flowId).update(drop.getId(), drop));

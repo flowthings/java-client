@@ -35,6 +35,7 @@ public class QueryOptions {
   protected Integer skip;
   protected Integer limit;
   protected String filter;
+  protected Map<String,String> other = new HashMap<>();
 
   /**
    * The order in which to sort the results
@@ -87,6 +88,15 @@ public class QueryOptions {
     return this;
   }
 
+  /**
+   * For adding additional query parameters to the request.
+   * Not guaranteed to have any affect!
+   *
+   */
+  public void addOtherOption(String key, String value){
+    this.other.put(key, value);
+  }
+
   public Map<String, String> toMap() {
     Map<String, String> results = new HashMap<>();
     if (skip != null) {
@@ -101,6 +111,9 @@ public class QueryOptions {
     if (!sorts.isEmpty()) {
       results.put("sort", sorts.keySet().iterator().next());
       results.put("order", sorts.values().iterator().next().toString());
+    }
+    for (String key : other.keySet()){
+      results.put(key, other.get(key));
     }
 
     return results;
