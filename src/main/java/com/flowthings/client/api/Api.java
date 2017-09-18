@@ -7,13 +7,18 @@ import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 public abstract class Api {
 
   protected static Logger logger = Logger.getLogger("com.flow.client.api.Api");
 
-  protected String collectResponse(InputStream response) throws IOException {
-    BufferedReader r = new BufferedReader(new InputStreamReader(response));
+  protected String collectResponse(boolean gzip, InputStream response) throws IOException {
+    InputStream in = response;
+    if (gzip){
+      in = new GZIPInputStream(response);
+    }
+    BufferedReader r = new BufferedReader(new InputStreamReader(in));
     StringBuilder out = new StringBuilder();
     String s = null;
     while ((s = r.readLine()) != null) {

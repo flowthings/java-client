@@ -1,17 +1,18 @@
 package com.flowthings.client.api;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import com.flowthings.client.Credentials;
 import com.flowthings.client.Header;
@@ -63,21 +64,42 @@ public class RestApi extends Api {
         throw new FlowthingsException("Cannot send " + request.action + " using the RestAPI");
       }
       Map<String, Object> headers = new Header(credentials).toMap();
+      headers.put("Accept-Encoding","gzip");
+      headers.put("User-Agent", "trackrunner gzip");
+      if (request.body != null) {
+        headers.put("Content-Encoding", "gzip");
+      }
       setRequestProperties(connection, headers);
       connection.setDoInput(true);
-      connection.setRequestMethod(method.toString());
+      connection.setRequestMethod(method);
       if (request.body != null) {
         connection.setDoOutput(true);
-        try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            GZIPOutputStream gzos = new GZIPOutputStream(baos);
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
           // logger.log(Level.INFO, request.body);
-          out.writeBytes(request.body);
+          gzos.write(request.body.getBytes("UTF-8"));
+          gzos.close();
+          byte[] gzipped = baos.toByteArray();
+//          out.writeBytes(request.body);
+          out.write(gzipped);
           out.flush();
         }
       }
       // Todo - big cleanup here
       String stringResponse = null;
+      boolean gzip = false;
       try {
-        stringResponse = collectResponse(connection.getInputStream());
+        Map<String, List<String>> responseHeaders = connection.getHeaderFields();
+        List<String> strings = responseHeaders.get("Content-Encoding");
+        if (strings != null){
+          for (String header : strings) {
+            if(header.equals("gzip")){
+              gzip = true;
+            }
+          }
+        }
+        stringResponse = collectResponse(gzip, connection.getInputStream());
         Response<S> response = Serializer.fromJson(stringResponse, request.typeToken);
         int status = response.getHead().getStatus();
         if (response.getHead().isOk()) {
@@ -93,7 +115,7 @@ public class RestApi extends Api {
         throw new ConnectionRefusedException(String.format("Error connecting to %s: %s", url, e.getMessage()));
       } catch (Exception e) {
         try {
-          stringResponse = collectResponse(connection.getErrorStream());
+          stringResponse = collectResponse(gzip, connection.getErrorStream());
         } catch (Exception e2) {
           throw new FlowthingsException(e);
         }

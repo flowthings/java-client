@@ -1,3 +1,7 @@
+v0.9.3.2 - 09/18/2017
+==============
+- Support GZIP request and response bodies
+
 v0.9.3.1 - 08/01/2017
 ==============
 - Support "Find Drops By Path Name" API endpoint
