@@ -49,7 +49,7 @@ public class RestApiTests {
     Credentials alicecreds = new Credentials("alice", "sFIRjS5QMcJJcZp8qWSGeE5i3967QcYx");
     Identity i = new Identity.Builder().setName("foo2").get();
     i.setEmail("asb@basca.com");
-    RestApi api2 = new RestApi(syscreds, "localhost:3000/v0.1", false);
+    RestApi api2 = new RestApi(syscreds, "localhost:3000/v4.0", false);
     i = api2.send(Flowthings.identity().create(i));
     System.out.println(i);
   }

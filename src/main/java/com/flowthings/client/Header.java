@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Header {
-  public static final String FLOW_VERSION_STRING = "Flow java client v0.1";
+  public static final String FLOW_VERSION_STRING = "Flow java client v4.0";
 
   public enum MIME_TYPE {
     JSON("application/json"), XML("text/xml");

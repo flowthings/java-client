@@ -45,7 +45,7 @@ public class RestApi extends Api {
   }
 
   public RestApi(Credentials credentials) {
-    this(credentials, "api.flowthings.io/v0.1", true);
+    this(credentials, "api.flowthings.io/v4.0", true);
   }
 
   public RestApi(Credentials credentials, String host, boolean secure) {
